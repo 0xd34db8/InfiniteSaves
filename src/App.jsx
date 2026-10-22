@@ -1,4 +1,10 @@
-import React, { useState, useMemo, useCallback, useRef, useEffect } from "react";
+import React, {
+  useState,
+  useMemo,
+  useCallback,
+  useRef,
+  useEffect,
+} from "react";
 import { Header } from "./components/Header";
 import { CharacterList } from "./components/CharacterList";
 import { CharacterEditor } from "./components/CharacterEditor";
@@ -10,11 +16,16 @@ import { Icon } from "./components/Icons";
 import { POWER_FIELDS } from "./constants/powers";
 import { useTheme } from "./hooks/useTheme";
 import { parseSaveBytes, patchSaveBytes } from "./utils/saveBytes";
-import { saveSessionState, loadSessionState, clearSessionState } from "./utils/storage";
+import {
+  saveSessionState,
+  loadSessionState,
+  clearSessionState,
+} from "./utils/storage";
 import logoImg from "./assets/logo.png";
 
 export default function App() {
-  const { themePreference, effectiveTheme, setThemeMode, toggleTheme } = useTheme();
+  const { themePreference, effectiveTheme, setThemeMode, toggleTheme } =
+    useTheme();
 
   const [saveData, setSaveData] = useState(null);
   const [originalData, setOriginalData] = useState(null);
@@ -97,9 +108,15 @@ export default function App() {
           if (saved.rosterType) setRosterType(saved.rosterType);
           if (saved.selectedId) setSelectedId(saved.selectedId);
           if (saved.searchQuery) setSearchQuery(saved.searchQuery);
-          if (saved.filterTab) setFilterTab(saved.filterTab === "powered" ? "all" : saved.filterTab);
+          if (saved.filterTab)
+            setFilterTab(
+              saved.filterTab === "powered" ? "all" : saved.filterTab,
+            );
 
-          showToast(`Restored active session for '${saved.fileName || "Save File"}'`, "info");
+          showToast(
+            `Restored active session for '${saved.fileName || "Save File"}'`,
+            "info",
+          );
         }
       } catch (err) {
         console.warn("Failed to restore session from IndexedDB:", err);
@@ -197,65 +214,83 @@ export default function App() {
   }, []);
 
   // Process uploaded save file (supports both direct .bytes and decompiled .txt / .json)
-  const processSaveFile = useCallback((file) => {
-    const isBytes = file.name.toLowerCase().endsWith(".bytes");
+  const processSaveFile = useCallback(
+    (file) => {
+      const isBytes = file.name.toLowerCase().endsWith(".bytes");
 
-    if (isBytes) {
+      if (isBytes) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          try {
+            const buffer = e.target.result;
+            const {
+              saveData: parsed,
+              offsets,
+              rawBuffer,
+            } = parseSaveBytes(buffer);
+            if (
+              !parsed.savedChars ||
+              Object.keys(parsed.savedChars).length === 0
+            ) {
+              throw new Error(
+                "Could not parse character records from this .bytes file.",
+              );
+            }
+            setSaveData(parsed);
+            setOriginalData(JSON.parse(JSON.stringify(parsed)));
+            setFileName(file.name);
+            setRawBytesBuffer(rawBuffer);
+            setBytesOffsets(offsets);
+            setChangesLog([]);
+            if (parsed.savedChars["200"]) {
+              setSelectedId("200");
+            } else {
+              setSelectedId(Object.keys(parsed.savedChars)[0] || null);
+            }
+            showToast(
+              `Direct binary '${file.name}' loaded (${Object.keys(parsed.savedChars).length} characters)! Ready to edit.`,
+              "success",
+            );
+          } catch (err) {
+            alert("Failed to parse .bytes save file: " + err.message);
+          }
+        };
+        reader.readAsArrayBuffer(file);
+        return;
+      }
+
+      // Otherwise text / JSON file
       const reader = new FileReader();
       reader.onload = (e) => {
         try {
-          const buffer = e.target.result;
-          const { saveData: parsed, offsets, rawBuffer } = parseSaveBytes(buffer);
-          if (!parsed.savedChars || Object.keys(parsed.savedChars).length === 0) {
-            throw new Error("Could not parse character records from this .bytes file.");
+          const text = e.target.result;
+          const parsed = JSON.parse(text);
+          if (!parsed.savedChars) {
+            throw new Error("Invalid save file: missing 'savedChars' roster.");
           }
           setSaveData(parsed);
           setOriginalData(JSON.parse(JSON.stringify(parsed)));
           setFileName(file.name);
-          setRawBytesBuffer(rawBuffer);
-          setBytesOffsets(offsets);
+          setRawBytesBuffer(null);
+          setBytesOffsets(null);
           setChangesLog([]);
           if (parsed.savedChars["200"]) {
             setSelectedId("200");
           } else {
             setSelectedId(Object.keys(parsed.savedChars)[0] || null);
           }
-          showToast(`Direct binary '${file.name}' loaded (${Object.keys(parsed.savedChars).length} characters)! Ready to edit.`, "success");
+          showToast(
+            `Successfully loaded '${file.name}' with ${Object.keys(parsed.savedChars).length} characters!`,
+            "success",
+          );
         } catch (err) {
-          alert("Failed to parse .bytes save file: " + err.message);
+          alert("Failed to parse save file: " + err.message);
         }
       };
-      reader.readAsArrayBuffer(file);
-      return;
-    }
-
-    // Otherwise text / JSON file
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      try {
-        const text = e.target.result;
-        const parsed = JSON.parse(text);
-        if (!parsed.savedChars) {
-          throw new Error("Invalid save file: missing 'savedChars' roster.");
-        }
-        setSaveData(parsed);
-        setOriginalData(JSON.parse(JSON.stringify(parsed)));
-        setFileName(file.name);
-        setRawBytesBuffer(null);
-        setBytesOffsets(null);
-        setChangesLog([]);
-        if (parsed.savedChars["200"]) {
-          setSelectedId("200");
-        } else {
-          setSelectedId(Object.keys(parsed.savedChars)[0] || null);
-        }
-        showToast(`Successfully loaded '${file.name}' with ${Object.keys(parsed.savedChars).length} characters!`, "success");
-      } catch (err) {
-        alert("Failed to parse save file: " + err.message);
-      }
-    };
-    reader.readAsText(file, "utf-8");
-  }, [showToast]);
+      reader.readAsText(file, "utf-8");
+    },
+    [showToast],
+  );
 
   const handleUploadFile = (e) => {
     const file = e.target.files?.[0];
@@ -281,8 +316,11 @@ export default function App() {
   }, [changesLog]);
 
   const currentRoster = saveData ? saveData[rosterType] : null;
-  const selectedCharacter = currentRoster && selectedId ? currentRoster[selectedId] : null;
-  const timeMachineChar = saveData?.timeChars ? saveData.timeChars[selectedId] : null;
+  const selectedCharacter =
+    currentRoster && selectedId ? currentRoster[selectedId] : null;
+  const timeMachineChar = saveData?.timeChars
+    ? saveData.timeChars[selectedId]
+    : null;
 
   // Update a single property on the active character
   const handleUpdateField = (fieldKey, value) => {
@@ -386,7 +424,10 @@ export default function App() {
       POWER_FIELDS.forEach((f) => {
         const oldVal = sc[f];
         const newVal = timeMachineChar[f];
-        sc[f] = typeof newVal === "object" && newVal !== null ? { ...newVal } : newVal;
+        sc[f] =
+          typeof newVal === "object" && newVal !== null
+            ? { ...newVal }
+            : newVal;
 
         changes.push({
           id: Date.now() + Math.random(),
@@ -440,7 +481,10 @@ export default function App() {
     });
 
     setChangesLog((prev) => [...changes, ...prev]);
-    showToast(`Successfully cloned all powers and power amounts from Time Machine for ${selectedCharacter.name}!`, "success");
+    showToast(
+      `Successfully cloned all powers and power amounts from Time Machine for ${selectedCharacter.name}!`,
+      "success",
+    );
   };
 
   // Apply a preset loadout
@@ -454,7 +498,11 @@ export default function App() {
       const char = { ...copy[rosterType][selectedId] };
 
       Object.entries(loadout).forEach(([fieldKey, newVal]) => {
-        if (fieldKey === "superStat" && typeof newVal === "object" && newVal !== null) {
+        if (
+          fieldKey === "superStat" &&
+          typeof newVal === "object" &&
+          newVal !== null
+        ) {
           char.superStat = { ...char.superStat };
           Object.entries(newVal).forEach(([sk, sVal]) => {
             const oldVal = char.superStat[sk];
@@ -472,7 +520,10 @@ export default function App() {
           });
         } else {
           const oldVal = char[fieldKey];
-          char[fieldKey] = typeof newVal === "object" && newVal !== null ? { ...newVal } : newVal;
+          char[fieldKey] =
+            typeof newVal === "object" && newVal !== null
+              ? { ...newVal }
+              : newVal;
 
           changes.push({
             id: Date.now() + Math.random(),
@@ -492,7 +543,10 @@ export default function App() {
     });
 
     setChangesLog((prev) => [...changes, ...prev]);
-    showToast(`Applied preset loadout to ${selectedCharacter.name}!`, "success");
+    showToast(
+      `Applied preset loadout to ${selectedCharacter.name}!`,
+      "success",
+    );
   };
 
   // Revert changes on the selected character
@@ -510,7 +564,10 @@ export default function App() {
 
     // Remove logs for this character
     setChangesLog((prev) => prev.filter((log) => log.charId !== selectedId));
-    showToast(`Reverted changes for ${selectedCharacter?.name || selectedId}`, "info");
+    showToast(
+      `Reverted changes for ${selectedCharacter?.name || selectedId}`,
+      "info",
+    );
   };
 
   // Revert a single change from the audit log
@@ -543,7 +600,12 @@ export default function App() {
   // Clear all changes back to original
   const handleClearAllChanges = () => {
     if (!originalData) return;
-    if (!window.confirm("Are you sure you want to revert all changes made in this session?")) return;
+    if (
+      !window.confirm(
+        "Are you sure you want to revert all changes made in this session?",
+      )
+    )
+      return;
     setSaveData(JSON.parse(JSON.stringify(originalData)));
     setChangesLog([]);
     setIsAuditOpen(false);
@@ -559,10 +621,14 @@ export default function App() {
     if (templateCacheRef.current) {
       return templateCacheRef.current;
     }
-    const templatePath = (import.meta.env.BASE_URL || "/").replace(/\/$/, "") + "/Save-template.bytes";
+    const templatePath =
+      (import.meta.env.BASE_URL || "/").replace(/\/$/, "") +
+      "/Save-template.bytes";
     const res = await fetch(templatePath);
     if (!res.ok) {
-      throw new Error(`Failed to load base binary template: HTTP ${res.status}`);
+      throw new Error(
+        `Failed to load base binary template: HTTP ${res.status}`,
+      );
     }
     const buf = await res.arrayBuffer();
     const { offsets } = parseSaveBytes(buf);
@@ -589,7 +655,10 @@ export default function App() {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-      showToast(`Exported game-ready binary '${a.download}'! Ready to inject into game.`, "success");
+      showToast(
+        `Exported game-ready binary '${a.download}'! Ready to inject into game.`,
+        "success",
+      );
     } catch (err) {
       alert("Failed to export .bytes: " + err.message);
     }
@@ -614,7 +683,9 @@ export default function App() {
   // Close active save and wipe persisted session from IndexedDB
   const handleCloseSave = async () => {
     if (changesLog.length > 0) {
-      if (!window.confirm("You have unsaved edits in this session. Close anyway?")) {
+      if (
+        !window.confirm("You have unsaved edits in this session. Close anyway?")
+      ) {
         return;
       }
     }
@@ -651,12 +722,16 @@ export default function App() {
       {/* Drag & Drop Overlay */}
       {dragOver && (
         <div className="absolute inset-0 z-50 glass-surface border-2 border-dashed border-black/20 dark:border-white/20 flex flex-col items-center justify-center pointer-events-none p-6 text-center">
-          <Icon name="upload" className="w-10 h-10 text-neutral-700 dark:text-neutral-300 mb-3" />
+          <Icon
+            name="upload"
+            className="w-10 h-10 text-neutral-700 dark:text-neutral-300 mb-3"
+          />
           <h2 className="text-xl font-medium tracking-tight text-neutral-900 dark:text-[#EDEDED]">
             Drop Save File Here
           </h2>
           <p className="text-xs text-neutral-600 dark:text-neutral-400 mt-1">
-            Accepts direct <span className="font-mono">Save.bytes</span> or decompiled JSON (<span className="font-mono">.txt / .json</span>)
+            Accepts direct <span className="font-mono">Save.bytes</span> or
+            decompiled JSON (<span className="font-mono">.txt / .json</span>)
           </p>
         </div>
       )}
@@ -668,15 +743,23 @@ export default function App() {
             toast.type === "success"
               ? "text-emerald-600 dark:text-emerald-300"
               : toast.type === "error"
-              ? "text-rose-600 dark:text-rose-300"
-              : "text-neutral-700 dark:text-neutral-200"
+                ? "text-rose-600 dark:text-rose-300"
+                : "text-neutral-700 dark:text-neutral-200"
           }`}
         >
           <Icon
-            name={toast.type === "success" ? "check" : toast.type === "error" ? "x" : "zap"}
+            name={
+              toast.type === "success"
+                ? "check"
+                : toast.type === "error"
+                  ? "x"
+                  : "zap"
+            }
             className="w-3.5 h-3.5 shrink-0"
           />
-          <span className="text-neutral-800 dark:text-neutral-200">{toast.msg}</span>
+          <span className="text-neutral-800 dark:text-neutral-200">
+            {toast.msg}
+          </span>
         </div>
       )}
 
@@ -711,7 +794,9 @@ export default function App() {
               }`}
             >
               <Icon name="users" className="w-3.5 h-3.5" />
-              <span>Roster ({currentRoster ? Object.keys(currentRoster).length : 0})</span>
+              <span>
+                Roster ({currentRoster ? Object.keys(currentRoster).length : 0})
+              </span>
             </button>
             <button
               type="button"
@@ -723,7 +808,9 @@ export default function App() {
               }`}
             >
               <Icon name="sliders" className="w-3.5 h-3.5" />
-              <span>Editor {selectedCharacter ? `(#${selectedCharacter.id})` : ""}</span>
+              <span>
+                Editor {selectedCharacter ? `(#${selectedCharacter.id})` : ""}
+              </span>
             </button>
           </div>
         </div>
@@ -731,21 +818,20 @@ export default function App() {
 
       {/* Main App Layout */}
       {!saveData ? (
-        <div className="flex-1 flex flex-col items-center justify-center p-8 text-center max-w-lg mx-auto">
+        <div className="flex-1 flex flex-col items-center justify-center p-6 sm:p-8 text-center max-w-xl mx-auto overflow-y-auto">
           <img
             src={logoImg}
-            alt="Infinite Saves Logo"
-            className="w-28 h-28 sm:w-36 sm:h-36 object-contain mb-5 select-none drop-shadow-lg"
+            alt="Infinite Saves - MDickie Infinite Lives Save Editor Logo"
+            width="128"
+            height="128"
+            className="w-24 h-24 sm:w-32 sm:h-32 object-contain mb-4 select-none drop-shadow-lg"
           />
-          <h2 className="text-xl font-medium text-neutral-900 dark:text-[#EDEDED] tracking-tight mb-2">
-            No Save File Loaded
+          <h2 className="text-xl sm:text-2xl font-bold text-neutral-900 dark:text-[#EDEDED] tracking-tight mb-2">
+            Infinite Saves — MDickie's Infinite Lives Save Editor
           </h2>
-          <p className="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed mb-6 max-w-sm">
-            Upload your direct <span className="font-mono text-neutral-800 dark:text-neutral-200">Save.bytes</span> or decompiled save file (<span className="font-mono text-neutral-800 dark:text-neutral-200">.txt</span> /{" "}
-            <span className="font-mono text-neutral-800 dark:text-neutral-200">.json</span>) or drag and drop it anywhere on the page to start editing superpowers and vitals.
-          </p>
-          <div className="flex items-center gap-3">
-            <label className="cursor-pointer text-xs font-medium px-4 py-2.5 bg-[#111111] text-[#EDEDED] hover:bg-[#262626] dark:bg-[#EDEDED] dark:text-[#111111] dark:hover:bg-[#F5F5F5] rounded-[8px] flex items-center gap-2 fast-transition active:scale-[0.98]">
+
+          <div className="flex flex-wrap items-center justify-center gap-3 mb-6">
+            <label className="cursor-pointer text-xs font-medium px-4 py-2.5 bg-[#111111] text-[#EDEDED] hover:bg-[#262626] dark:bg-[#EDEDED] dark:text-[#111111] dark:hover:bg-[#F5F5F5] rounded-[8px] flex items-center gap-2 fast-transition active:scale-[0.98] shadow-sm">
               <Icon name="upload" className="w-4 h-4" />
               <span>Select Save File</span>
               <input
@@ -761,8 +847,30 @@ export default function App() {
               className="cursor-pointer text-xs font-medium px-4 py-2.5 bg-black/[0.04] hover:bg-black/[0.08] dark:bg-white/[0.04] dark:hover:bg-white/[0.08] text-neutral-700 dark:text-neutral-200 border border-black/[0.08] dark:border-white/[0.08] rounded-[8px] flex items-center gap-2 fast-transition active:scale-[0.98]"
             >
               <Icon name="help" className="w-4 h-4" />
-              <span>View Guide</span>
+              <span>Reference Guide</span>
             </button>
+          </div>
+
+          <div className="text-[11px] text-neutral-500 dark:text-neutral-400 bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.06] dark:border-white/[0.06] rounded-[8px] p-3 max-w-md text-left space-y-1">
+            <div className="font-semibold text-neutral-700 dark:text-neutral-300">
+              Save File Locations:
+            </div>
+            <div>
+              <strong className="text-neutral-800 dark:text-neutral-200">
+                Steam / PC:
+              </strong>{" "}
+              <code className="font-mono text-[10px]">
+                SteamLibrary/.../Infinite Lives/Save.bytes
+              </code>
+            </div>
+            <div>
+              <strong className="text-neutral-800 dark:text-neutral-200">
+                Android:
+              </strong>{" "}
+              <code className="font-mono text-[10px]">
+                Android/data/com.MDickie.InfiniteLives/files/Save.bytes
+              </code>
+            </div>
           </div>
         </div>
       ) : (
@@ -828,10 +936,7 @@ export default function App() {
         onClearAllChanges={handleClearAllChanges}
       />
 
-      <GuideModal
-        isOpen={isGuideOpen}
-        onClose={() => setIsGuideOpen(false)}
-      />
+      <GuideModal isOpen={isGuideOpen} onClose={() => setIsGuideOpen(false)} />
     </div>
   );
 }

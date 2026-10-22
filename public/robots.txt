@@ -1,0 +1,10 @@
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Allow: /
+
+# Host
+Host: https://infinite-saves.vercel.app
+
+# Sitemaps
+Sitemap: https://infinite-saves.vercel.app/sitemap.xml
+

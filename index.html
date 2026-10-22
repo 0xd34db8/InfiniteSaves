@@ -1,35 +1,444 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" dir="ltr">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" href="/favicon.png" />
-    <link rel="apple-touch-icon" href="/favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Primary SEO Meta Tags -->
+    <title>Infinite Saves | MDickie's Infinite Lives Save Editor</title>
+    <meta
+      name="title"
+      content="Infinite Saves | MDickie's Infinite Lives Save Editor"
+    />
+    <meta
+      name="description"
+      content="Free in-browser save editor exclusively for MDickie's Infinite Lives. Direct Save.bytes binary patcher: unlock superpowers, max stats, edit health, and clone rosters with 100% client-side privacy."
+    />
+    <meta
+      name="keywords"
+      content="mdickie infinite lives save editor, infinite lives save editor, infinite saves, mdickie infinite lives, save.bytes editor, infinite lives save file, infinite lives character editor, infinite lives cheats, infinite lives superpowers, infinite lives mods, infinite lives binary patcher"
+    />
+    <meta name="author" content="Infinite Saves" />
+    <meta name="publisher" content="Infinite Saves" />
+    <link rel="canonical" href="https://infinite-saves.vercel.app/" />
+
+    <!-- Search Engine Indexing Directives -->
+    <meta
+      name="robots"
+      content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
+    />
+    <meta
+      name="googlebot"
+      content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"
+    />
+    <meta
+      name="bingbot"
+      content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"
+    />
+
+    <!-- Favicons & App Icons -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="48x48" href="/favicon.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <!-- Mobile Browser & PWA Meta -->
+    <meta
+      name="theme-color"
+      media="(prefers-color-scheme: light)"
+      content="#FAFAFA"
+    />
+    <meta
+      name="theme-color"
+      media="(prefers-color-scheme: dark)"
+      content="#0A0A0A"
+    />
+    <meta name="application-name" content="Infinite Saves" />
+    <meta name="apple-mobile-web-app-title" content="Infinite Saves" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <meta name="format-detection" content="telephone=no" />
+
+    <!-- Open Graph / Facebook / Discord / Reddit / Telegram -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://infinite-saves.vercel.app/" />
+    <meta
+      property="og:title"
+      content="Infinite Saves — MDickie's Infinite Lives Save Editor"
+    />
+    <meta
+      property="og:description"
+      content="Free in-browser save editor exclusively for MDickie's Infinite Lives. Direct Save.bytes binary patcher: unlock superpowers, uncapped stats, health, and clone rosters 100% client-side."
+    />
+    <meta
+      property="og:image"
+      content="https://infinite-saves.vercel.app/og-image.png"
+    />
+    <meta
+      property="og:image:secure_url"
+      content="https://infinite-saves.vercel.app/og-image.png"
+    />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="Infinite Saves — MDickie Infinite Lives Save Editor Preview"
+    />
+    <meta property="og:site_name" content="Infinite Saves" />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter / X Cards -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="https://infinite-saves.vercel.app/" />
+    <meta
+      name="twitter:title"
+      content="Infinite Saves — MDickie's Infinite Lives Save Editor"
+    />
+    <meta
+      name="twitter:description"
+      content="Free in-browser save editor exclusively for MDickie's Infinite Lives. Direct Save.bytes binary patcher: unlock superpowers, uncapped stats, health, and clone rosters 100% client-side."
+    />
+    <meta
+      name="twitter:image"
+      content="https://infinite-saves.vercel.app/og-image.png"
+    />
+    <meta
+      name="twitter:image:alt"
+      content="Infinite Saves — MDickie Infinite Lives Save Editor"
+    />
+
+    <!-- Performance: DNS Prefetch & Font Preconnect -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=JetBrains+Mono:wght@400;500;600&display=swap"
       rel="stylesheet"
     />
-    <title>Infinite Saves — MDickie Save Editor</title>
+
+    <!-- Theme Initialization Script (Prevents Dark Mode Flash) -->
     <script>
       (function () {
         try {
-          var saved = localStorage.getItem('mdickie_editor_theme');
-          var systemDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-          if (saved === 'crimson') {
-            document.documentElement.classList.add('dark', 'theme-crimson');
-          } else if (saved === 'dark' || (!saved && systemDark) || (saved === 'system' && systemDark)) {
-            document.documentElement.classList.add('dark');
+          var saved = localStorage.getItem("mdickie_editor_theme");
+          var systemDark =
+            window.matchMedia &&
+            window.matchMedia("(prefers-color-scheme: dark)").matches;
+          if (saved === "crimson") {
+            document.documentElement.classList.add("dark", "theme-crimson");
+          } else if (
+            saved === "dark" ||
+            (!saved && systemDark) ||
+            (saved === "system" && systemDark)
+          ) {
+            document.documentElement.classList.add("dark");
           } else {
-            document.documentElement.classList.remove('dark', 'theme-crimson');
+            document.documentElement.classList.remove("dark", "theme-crimson");
           }
         } catch (e) {}
       })();
     </script>
+
+    <!-- Schema.org Structured Data: WebApplication -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "@id": "https://infinite-saves.vercel.app/#webapp",
+        "name": "Infinite Saves",
+        "alternateName": [
+          "Infinite Lives Save Editor",
+          "MDickie Infinite Lives Save Editor",
+          "MDickie Save.bytes Editor"
+        ],
+        "url": "https://infinite-saves.vercel.app/",
+        "applicationCategory": "GameApplication, UtilitiesApplication",
+        "operatingSystem": "All (Web Browser, Windows, macOS, Android, Linux, iOS)",
+        "browserRequirements": "Requires JavaScript. Requires HTML5.",
+        "inLanguage": "en-US",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        },
+        "description": "Universal client-side save file editor and binary patcher exclusively for MDickie's Infinite Lives. Modify superpowers, health, uncapped attributes, and character rosters without uploading files to any server.",
+        "image": "https://infinite-saves.vercel.app/og-image.png",
+        "screenshot": "https://infinite-saves.vercel.app/og-image.png",
+        "featureList": [
+          "Native in-browser .NET BinaryFormatter (NRBF) Save.bytes parser and patcher for Infinite Lives",
+          "Zero server uploads - 100% private, client-side browser execution",
+          "Comprehensive superpower catalog: attack powers, limbs, flight, craft, innate abilities",
+          "Uncapped god-mode stat sliders up to 500% (Strength, Speed, Stamina, Toughness)",
+          "Dual roster inspection and editing: savedChars and timeChars snapshots",
+          "One-click superpower cloning from Time Machine to active persona",
+          "Ready-to-use superhero archetype presets (Titan, Speedster, Pyromancer, etc.)",
+          "Granular transaction audit log with single-attribute rollback and session history",
+          "Decompiled JSON save file compatibility (.txt, .json, saveeditonline.com format)"
+        ],
+        "author": {
+          "@type": "Organization",
+          "name": "Infinite Saves",
+          "url": "https://infinite-saves.vercel.app/"
+        }
+      }
+    </script>
+
+    <!-- Schema.org Structured Data: FAQPage -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "@id": "https://infinite-saves.vercel.app/#faq",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "How do I edit my Infinite Lives Save.bytes file?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Simply open Infinite Saves in any web browser and drag and drop your Save.bytes file onto the screen. Use the visual editor to adjust character stats, superpowers, health, and presets. Once finished, click 'Export Save.bytes' to download your patched binary file instantly."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Where can I find the Save.bytes file for Infinite Lives on Steam (PC) and Android?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "On Steam PC, save files are located in: SteamLibrary/steamapps/common/Infinite Lives/Save.bytes or in %USERPROFILE%/AppData/LocalLow/MDickie/Infinite Lives/. On Android, saves are located in Android/data/com.MDickie.InfiniteLives/files/Save.bytes."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Does Infinite Saves upload my save files to a server?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "No. Infinite Saves operates 100% client-side inside your browser using JavaScript and HTML5 ArrayBuffers. Your files never leave your computer or phone, guaranteeing complete privacy and zero upload waiting times."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Which game is supported by Infinite Saves?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Infinite Saves is built specifically and exclusively for MDickie's Infinite Lives, supporting its direct native Save.bytes binary format as well as decompiled text/JSON formats."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Can I give my character God Mode or uncapped superpowers in Infinite Lives?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes! While the in-game editor caps stats at 200%, Infinite Saves allows you to type uncapped values (such as 500% Strength, Speed, and Stamina) and apply God-mode superhero presets like Kryptonian, Speedster, or Pyromancer with one click."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Can I revert changes if I make a mistake?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. Infinite Saves includes a built-in session transaction Audit Log. You can inspect every attribute modification, roll back individual changes with one click, or revert a character back to their original state."
+            }
+          }
+        ]
+      }
+    </script>
+
+    <!-- Schema.org Structured Data: WebSite -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "@id": "https://infinite-saves.vercel.app/#website",
+        "name": "Infinite Saves",
+        "url": "https://infinite-saves.vercel.app/",
+        "description": "Universal web-based save file editor exclusively for MDickie's Infinite Lives."
+      }
+    </script>
   </head>
-  <body class="bg-[#FAFAFA] dark:bg-[#0A0A0A] text-neutral-900 dark:text-[#EDEDED] antialiased selection:bg-neutral-200 dark:selection:bg-neutral-800 selection:text-neutral-900 dark:selection:text-neutral-100 overflow-hidden font-sans">
-    <div id="root"></div>
+  <body
+    class="bg-[#FAFAFA] dark:bg-[#0A0A0A] text-neutral-900 dark:text-[#EDEDED] antialiased selection:bg-neutral-200 dark:selection:bg-neutral-800 selection:text-neutral-900 dark:selection:text-neutral-100 overflow-hidden font-sans"
+  >
+    <div id="root">
+      <!-- Semantic Crawler-Accessible Content (Hydrated by React on load) -->
+      <main
+        style="
+          max-width: 900px;
+          margin: 40px auto;
+          padding: 20px;
+          font-family: system-ui, sans-serif;
+          line-height: 1.6;
+          color: #222;
+        "
+      >
+        <header>
+          <h1
+            style="
+              font-size: 2.2rem;
+              font-weight: 700;
+              margin-bottom: 0.5rem;
+              color: #111;
+            "
+          >
+            Infinite Saves | MDickie's Infinite Lives Save Editor
+          </h1>
+          <p style="font-size: 1.15rem; color: #444; margin-bottom: 1.5rem">
+            The ultimate in-browser save editor and binary patcher exclusively
+            for MDickie's
+            <strong>Infinite Lives</strong>.
+          </p>
+        </header>
+
+        <section style="margin-bottom: 2rem">
+          <h2
+            style="
+              font-size: 1.5rem;
+              font-weight: 600;
+              margin-bottom: 0.75rem;
+              color: #222;
+            "
+          >
+            Key Capabilities &amp; Features
+          </h2>
+          <ul>
+            <li>
+              <strong>Direct Save.bytes Binary Editing:</strong> Natively
+              decodes and patches .NET BinaryFormatter (NRBF) save files
+              directly in your web browser.
+            </li>
+            <li>
+              <strong>100% Client-Side Privacy:</strong> Your save files never
+              leave your device. Zero server uploads, zero accounts, and zero
+              installation required.
+            </li>
+            <li>
+              <strong>Deep Superpower Customization:</strong> Customize
+              offensive attack beams, projectile limbs, flight and speed styles,
+              telekinesis, crafting, and alter-ego transformations.
+            </li>
+            <li>
+              <strong>Uncapped God Mode Stats:</strong> Break the in-game 200%
+              stat cap with 500%+ superhuman strength, speed, stamina, and
+              unlimited health.
+            </li>
+            <li>
+              <strong>Dual Roster Management:</strong> Switch freely between
+              active campaign characters (<code>savedChars</code>) and Time
+              Machine snapshots (<code>timeChars</code>).
+            </li>
+            <li>
+              <strong>Superhero Archetype Presets:</strong> Instantly apply
+              battle-tested presets including Titan (Kryptonian), Speedster,
+              Telekinetic God, and Pyromancer.
+            </li>
+            <li>
+              <strong>Full Audit Logging &amp; Rollback:</strong> Track all
+              character modifications with timestamps and restore values with
+              one click.
+            </li>
+          </ul>
+        </section>
+
+        <section style="margin-bottom: 2rem">
+          <h2
+            style="
+              font-size: 1.5rem;
+              font-weight: 600;
+              margin-bottom: 0.75rem;
+              color: #222;
+            "
+          >
+            Where to Find Infinite Lives Save.bytes Files
+          </h2>
+          <p>
+            Locate your save file on your device and drag it into Infinite
+            Saves:
+          </p>
+          <ul>
+            <li>
+              <strong>Steam / Windows PC:</strong>
+              <code
+                >SteamLibrary/steamapps/common/Infinite Lives/Save.bytes</code
+              >
+              or
+              <code
+                >%USERPROFILE%/AppData/LocalLow/MDickie/Infinite Lives/</code
+              >
+            </li>
+            <li>
+              <strong>Android:</strong>
+              <code
+                >Android/data/com.MDickie.InfiniteLives/files/Save.bytes</code
+              >
+            </li>
+            <li>
+              <strong>Third-Party Decompiled Saves:</strong> Supports
+              <code>.json</code> and <code>.txt</code> files decompiled via
+              saveeditonline.com.
+            </li>
+          </ul>
+        </section>
+
+        <section style="margin-bottom: 2rem">
+          <h2
+            style="
+              font-size: 1.5rem;
+              font-weight: 600;
+              margin-bottom: 0.75rem;
+              color: #222;
+            "
+          >
+            Frequently Asked Questions (FAQ)
+          </h2>
+          <dl>
+            <dt style="font-weight: 600; margin-top: 1rem">
+              How do I edit my Infinite Lives Save.bytes file?
+            </dt>
+            <dd>
+              Open Infinite Saves in any browser, drag and drop your Save.bytes
+              file, customize your character's stats and superpowers, then click
+              "Export Save.bytes" to download your patched save ready to play.
+            </dd>
+
+            <dt style="font-weight: 600; margin-top: 1rem">
+              Is Infinite Saves safe and private?
+            </dt>
+            <dd>
+              Yes. Everything is processed entirely in your web browser's memory
+              using JavaScript ArrayBuffers. No files are uploaded to any server
+              or third party.
+            </dd>
+
+            <dt style="font-weight: 600; margin-top: 1rem">
+              Which games are supported?
+            </dt>
+            <dd>
+              Infinite Saves is built specifically and exclusively for MDickie's
+              Infinite Lives.
+            </dd>
+          </dl>
+        </section>
+
+        <noscript>
+          <div
+            style="
+              padding: 16px;
+              background-color: #fff3cd;
+              border: 1px solid #ffeeba;
+              border-radius: 8px;
+              color: #856404;
+              margin-top: 20px;
+            "
+          >
+            <strong>JavaScript Required:</strong> Infinite Saves requires
+            JavaScript enabled to run the visual character editor and in-browser
+            binary patcher. Please enable JavaScript in your browser settings.
+          </div>
+        </noscript>
+      </main>
+    </div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

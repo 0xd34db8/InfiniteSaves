@@ -57,6 +57,8 @@ export function Header({
           <img
             src={logoImg}
             alt="Infinite Saves Logo"
+            width="64"
+            height="64"
             className="w-10 h-10 sm:w-14 sm:h-14 lg:w-16 lg:h-16 shrink-0 object-contain select-none -my-1 sm:-my-2 transition-transform hover:scale-105 drop-shadow-sm"
           />
           <div className="min-w-0">
