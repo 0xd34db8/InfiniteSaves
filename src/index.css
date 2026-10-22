@@ -1,0 +1,212 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+:root {
+  --bg-color: #FAFAFA;
+  --glass-bg: rgba(250, 250, 250, 0.85);
+  color-scheme: light;
+}
+
+.dark {
+  --bg-color: #0A0A0A;
+  --glass-bg: rgba(10, 10, 10, 0.75);
+  color-scheme: dark;
+}
+
+.theme-crimson {
+  --bg-color: #0B0608;
+  --glass-bg: rgba(12, 6, 8, 0.85);
+  color-scheme: dark;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--bg-color);
+  color: #171717;
+}
+
+.dark body {
+  color: #EDEDED;
+}
+
+.theme-crimson body {
+  color: #FFE4E6;
+}
+
+/* Custom focus ring complying with DESIGN.md rule 4 */
+.custom-focus {
+  outline: none;
+}
+.custom-focus:focus,
+.custom-focus:focus-visible {
+  outline: none !important;
+  box-shadow: 0 0 0 2px var(--bg-color), 0 0 0 4px rgba(120, 120, 120, 0.25) !important;
+  border-color: rgba(120, 120, 120, 0.35) !important;
+}
+
+.theme-crimson .custom-focus:focus,
+.theme-crimson .custom-focus:focus-visible {
+  box-shadow: 0 0 0 2px var(--bg-color), 0 0 0 4px rgba(244, 63, 94, 0.35) !important;
+  border-color: rgba(244, 63, 94, 0.45) !important;
+}
+
+/* Crimson Theme (Red/Black inspired by Revert button colors) */
+.theme-crimson .dark\:bg-\[\#121212\] {
+  background-color: #12090C !important;
+}
+
+.theme-crimson .dark\:bg-\[\#0A0A0A\] {
+  background-color: #0B0608 !important;
+}
+
+.theme-crimson .dark\:bg-\[\#0D0D0D\] {
+  background-color: #0E070A !important;
+}
+
+.theme-crimson .dark\:bg-\[\#141414\] {
+  background-color: #160B0F !important;
+}
+
+.theme-crimson .dark\:bg-\[\#EDEDED\] {
+  background-color: #E11D48 !important;
+  color: #FFFFFF !important;
+}
+
+.theme-crimson .dark\:hover\:bg-\[\#F5F5F5\]:hover {
+  background-color: #BE123C !important;
+}
+
+.theme-crimson .dark\:text-\[\#111111\] {
+  color: #FFFFFF !important;
+}
+
+.theme-crimson .dark\:border-white\/\[0\.08\] {
+  border-color: rgba(244, 63, 94, 0.16) !important;
+}
+
+.theme-crimson .dark\:border-white\/\[0\.12\] {
+  border-color: rgba(244, 63, 94, 0.25) !important;
+}
+
+.theme-crimson .dark\:border-white\/\[0\.1\] {
+  border-color: rgba(244, 63, 94, 0.2) !important;
+}
+
+.theme-crimson .dark\:border-white\/\[0\.06\] {
+  border-color: rgba(244, 63, 94, 0.12) !important;
+}
+
+.theme-crimson .dark\:border-white\/20 {
+  border-color: rgba(244, 63, 94, 0.3) !important;
+}
+
+.theme-crimson .dark\:text-\[\#EDEDED\] {
+  color: #FFE4E6 !important;
+}
+
+.theme-crimson .dark\:text-white {
+  color: #FFF1F2 !important;
+}
+
+.theme-crimson .dark\:text-neutral-200 {
+  color: #FECDD3 !important;
+}
+
+.theme-crimson .dark\:text-neutral-300 {
+  color: #FECDD3 !important;
+}
+
+.theme-crimson .dark\:text-neutral-400 {
+  color: #FDA4AF !important;
+  opacity: 0.85;
+}
+
+.theme-crimson .dark\:text-neutral-500 {
+  color: #F43F5E !important;
+  opacity: 0.7;
+}
+
+.theme-crimson .dark\:bg-white\/\[0\.01\] {
+  background-color: rgba(244, 63, 94, 0.02) !important;
+}
+
+.theme-crimson .dark\:bg-white\/\[0\.02\] {
+  background-color: rgba(244, 63, 94, 0.04) !important;
+}
+
+.theme-crimson .dark\:bg-white\/\[0\.03\] {
+  background-color: rgba(244, 63, 94, 0.06) !important;
+}
+
+.theme-crimson .dark\:bg-white\/\[0\.04\] {
+  background-color: rgba(244, 63, 94, 0.08) !important;
+}
+
+.theme-crimson .dark\:bg-white\/\[0\.06\] {
+  background-color: rgba(244, 63, 94, 0.12) !important;
+}
+
+.theme-crimson .dark\:bg-white\/\[0\.08\] {
+  background-color: rgba(244, 63, 94, 0.16) !important;
+}
+
+.theme-crimson .dark\:hover\:bg-white\/\[0\.08\]:hover {
+  background-color: rgba(244, 63, 94, 0.18) !important;
+}
+
+.theme-crimson .dark\:hover\:bg-white\/\[0\.04\]:hover {
+  background-color: rgba(244, 63, 94, 0.12) !important;
+}
+
+.theme-crimson .dark\:hover\:bg-white\/\[0\.06\]:hover {
+  background-color: rgba(244, 63, 94, 0.14) !important;
+}
+
+.theme-crimson .dark\:hover\:border-white\/\[0\.14\]:hover {
+  border-color: rgba(244, 63, 94, 0.35) !important;
+}
+
+.theme-crimson .dark\:hover\:border-white\/\[0\.2\]:hover {
+  border-color: rgba(244, 63, 94, 0.45) !important;
+}
+
+.theme-crimson ::selection {
+  background-color: rgba(244, 63, 94, 0.35);
+  color: #FFFFFF;
+}
+
+.theme-crimson ::-webkit-scrollbar-track {
+  background: #0B0608;
+}
+
+.theme-crimson ::-webkit-scrollbar-thumb {
+  background: rgba(244, 63, 94, 0.25);
+  border-radius: 4px;
+}
+
+.theme-crimson ::-webkit-scrollbar-thumb:hover {
+  background: rgba(244, 63, 94, 0.45);
+}
+
+/* Glassmorphism utility specified in DESIGN.md rule 2 */
+.glass-surface {
+  backdrop-filter: blur(12px) saturate(150%);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
+  background-color: var(--glass-bg);
+}
+
+/* Modal spring transition from DESIGN.md rule 5 */
+.modal-spring {
+  transition: all 250ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Interactive transitions from DESIGN.md rule 5 */
+.fast-transition {
+  transition: all 100ms ease-out;
+}
