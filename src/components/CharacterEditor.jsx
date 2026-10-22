@@ -6,6 +6,7 @@ import {
   cleanPowerLabel,
 } from "../constants/powers";
 import { PowerAmountEditor } from "./PowerAmountEditor";
+import { PhysiqueEditor } from "./PhysiqueEditor";
 
 function PowerDropdown({
   value,
@@ -32,11 +33,11 @@ function PowerDropdown({
   }, [isOpen, onClose]);
 
   const matched = meta.proven.find((opt) => opt.id === Number(value));
-  const currentLabel = matched ? cleanPowerLabel(matched.label) : `Internal ID`;
-
-  const filteredInternalIds = (meta.observed || []).filter(
-    (id) => !meta.proven.some((p) => p.id === id),
-  );
+  const currentLabel = matched
+    ? cleanPowerLabel(matched.label)
+    : value !== undefined && value !== 0
+      ? `Custom (${value})`
+      : "None";
 
   return (
     <div className="relative" ref={dropdownRef}>
@@ -44,23 +45,18 @@ function PowerDropdown({
         type="button"
         onClick={onToggle}
         className={`w-full bg-white dark:bg-white/[0.03] border border-black/[0.12] dark:border-white/[0.12] hover:border-black/[0.2] dark:hover:border-white/[0.2] text-neutral-900 dark:text-[#EDEDED] text-xs rounded-[6px] ${
-          compact ? "px-2 py-1.5" : "px-3 py-2"
+          compact ? "px-2.5 py-1.5" : "px-3 py-2"
         } flex items-center justify-between gap-2 custom-focus fast-transition text-left cursor-pointer`}
       >
         <span className="truncate font-medium text-neutral-900 dark:text-[#EDEDED]">
           {currentLabel}
         </span>
-        <div className="flex items-center gap-1.5 shrink-0">
-          <span className="px-1.5 py-0.5 rounded-[4px] text-[10px] font-mono font-medium bg-black/[0.04] dark:bg-white/[0.06] text-neutral-600 dark:text-neutral-300 border border-black/[0.08] dark:border-white/[0.08]">
-            ID: {value ?? 0}
-          </span>
-          <Icon
-            name="chevron-down"
-            className={`w-3 h-3 text-neutral-400 fast-transition ${
-              isOpen ? "rotate-180" : ""
-            }`}
-          />
-        </div>
+        <Icon
+          name="chevron-down"
+          className={`w-3.5 h-3.5 text-neutral-400 shrink-0 fast-transition ${
+            isOpen ? "rotate-180" : ""
+          }`}
+        />
       </button>
 
       {isOpen && (
@@ -69,10 +65,6 @@ function PowerDropdown({
             compact ? "min-w-[170px] left-0" : "left-0 right-0"
           } top-full mt-1.5 z-50 bg-white dark:bg-[#141414] border border-black/[0.12] dark:border-white/[0.12] rounded-[8px] py-1 shadow-lg max-h-60 overflow-y-auto`}
         >
-          {/* Verified Superpowers */}
-          <div className="px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-neutral-400 dark:text-neutral-500">
-            Verified Superpowers
-          </div>
           {meta.proven.map((opt) => {
             const isSelected = Number(value) === opt.id;
             return (
@@ -83,7 +75,7 @@ function PowerDropdown({
                   onChange(opt.id);
                   onClose();
                 }}
-                className={`w-full px-2.5 py-1.5 text-xs flex items-center justify-between text-left fast-transition cursor-pointer ${
+                className={`w-full px-3 py-1.5 text-xs flex items-center justify-between text-left fast-transition cursor-pointer ${
                   isSelected
                     ? "bg-black/[0.06] dark:bg-white/[0.08] font-medium"
                     : "hover:bg-black/[0.04] dark:hover:bg-white/[0.04]"
@@ -92,65 +84,19 @@ function PowerDropdown({
                 <span className="truncate text-neutral-900 dark:text-[#EDEDED]">
                   {cleanPowerLabel(opt.label)}
                 </span>
-                <span className="ml-2 shrink-0 px-1.5 py-0.5 rounded-[4px] text-[10px] font-mono font-medium bg-black/[0.04] dark:bg-white/[0.06] text-neutral-600 dark:text-neutral-300 border border-black/[0.08] dark:border-white/[0.08]">
-                  ID: {opt.id}
-                </span>
               </button>
             );
           })}
 
-          {/* Current value if unmapped */}
-          {!matched && (
-            <>
-              <div className="px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 border-t border-black/[0.06] dark:border-white/[0.06] mt-1 pt-1">
-                Current Value
-              </div>
-              <button
-                type="button"
-                className="w-full px-2.5 py-1.5 text-xs flex items-center justify-between text-left bg-black/[0.06] dark:bg-white/[0.08] font-medium cursor-pointer"
-              >
-                <span className="truncate text-neutral-900 dark:text-[#EDEDED]">
-                  Internal ID
-                </span>
-                <span className="ml-2 shrink-0 px-1.5 py-0.5 rounded-[4px] text-[10px] font-mono font-medium bg-black/[0.04] dark:bg-white/[0.06] text-neutral-600 dark:text-neutral-300 border border-black/[0.08] dark:border-white/[0.08]">
-                  ID: {value}
-                </span>
-              </button>
-            </>
-          )}
-
-          {/* Other Internal IDs */}
-          {filteredInternalIds.length > 0 && (
-            <>
-              <div className="px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 border-t border-black/[0.06] dark:border-white/[0.06] mt-1 pt-1">
-                Other Internal IDs
-              </div>
-              {filteredInternalIds.map((id) => {
-                const isSelected = Number(value) === id;
-                return (
-                  <button
-                    key={id}
-                    type="button"
-                    onClick={() => {
-                      onChange(id);
-                      onClose();
-                    }}
-                    className={`w-full px-2.5 py-1.5 text-xs flex items-center justify-between text-left fast-transition cursor-pointer ${
-                      isSelected
-                        ? "bg-black/[0.06] dark:bg-white/[0.08] font-medium"
-                        : "hover:bg-black/[0.04] dark:hover:bg-white/[0.04]"
-                    }`}
-                  >
-                    <span className="truncate text-neutral-700 dark:text-neutral-300">
-                      Internal ID
-                    </span>
-                    <span className="ml-2 shrink-0 px-1.5 py-0.5 rounded-[4px] text-[10px] font-mono font-medium bg-black/[0.04] dark:bg-white/[0.06] text-neutral-600 dark:text-neutral-300 border border-black/[0.08] dark:border-white/[0.08]">
-                      ID: {id}
-                    </span>
-                  </button>
-                );
-              })}
-            </>
+          {!matched && value !== 0 && value !== undefined && (
+            <button
+              type="button"
+              className="w-full px-3 py-1.5 text-xs flex items-center justify-between text-left bg-black/[0.06] dark:bg-white/[0.08] font-medium cursor-pointer"
+            >
+              <span className="truncate text-neutral-900 dark:text-[#EDEDED]">
+                Custom ({value})
+              </span>
+            </button>
           )}
         </div>
       )}
@@ -165,6 +111,7 @@ export function CharacterEditor({
   onUpdateField,
   onUpdateLimb,
   onUpdateStat,
+  onBatchUpdateStats,
   onCloneFromTimeMachine,
   onOpenPresets,
   onOpenCompare,
@@ -289,7 +236,7 @@ export function CharacterEditor({
                 type="button"
                 onClick={onCloneFromTimeMachine}
                 className="cursor-pointer text-xs font-medium px-4 py-2.5 sm:py-2 min-h-[44px] md:min-h-[32px] w-full sm:w-auto bg-[#111111] text-[#EDEDED] hover:bg-[#262626] dark:bg-[#EDEDED] dark:text-[#111111] dark:hover:bg-[#F5F5F5] rounded-[8px] flex items-center justify-center gap-2 fast-transition active:scale-[0.98]"
-                title="Copy all 9 powers from this character's Time Machine snapshot"
+                title="Copy powers, stats, and physique from this character's Time Machine snapshot"
               >
                 <Icon name="clock" className="w-3.5 h-3.5 shrink-0" />
                 <span>Clone from Time Machine</span>
@@ -330,7 +277,7 @@ export function CharacterEditor({
         </div>
 
         {/* Identity Editable Fields */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 sm:gap-4 mt-4 sm:mt-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4 mt-4 sm:mt-5">
           <div>
             <label className="block text-[11px] font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400 mb-1.5">
               Character Name
@@ -343,6 +290,7 @@ export function CharacterEditor({
               className="w-full bg-white dark:bg-white/[0.03] border border-black/[0.12] dark:border-white/[0.12] text-neutral-900 dark:text-[#EDEDED] text-xs sm:text-sm rounded-[6px] px-3.5 py-2 custom-focus fast-transition placeholder-neutral-400 dark:placeholder-neutral-500"
             />
           </div>
+
           <div>
             <label className="block text-[11px] font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400 mb-1.5">
               Alias / Nickname
@@ -355,12 +303,72 @@ export function CharacterEditor({
               className="w-full bg-white dark:bg-white/[0.03] border border-black/[0.12] dark:border-white/[0.12] text-neutral-900 dark:text-[#EDEDED] text-xs sm:text-sm rounded-[6px] px-3.5 py-2 custom-focus fast-transition placeholder-neutral-400 dark:placeholder-neutral-500"
             />
           </div>
+
+          <div>
+            <label className="block text-[11px] font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400 mb-1.5">
+              Gender
+            </label>
+            <div className="grid grid-cols-2 gap-1 p-1 bg-black/[0.04] dark:bg-white/[0.04] border border-black/[0.06] dark:border-white/[0.06] rounded-[6px]">
+              <button
+                type="button"
+                onClick={() => onUpdateField("gender", 0)}
+                className={`cursor-pointer py-1 text-xs font-medium rounded-[4px] fast-transition text-center ${
+                  Number(character.gender ?? 0) === 0
+                    ? "bg-white dark:bg-[#1E1E1E] text-sky-600 dark:text-sky-400 font-semibold shadow-xs"
+                    : "text-neutral-500 hover:text-neutral-900 dark:text-neutral-400"
+                }`}
+              >
+                Male
+              </button>
+              <button
+                type="button"
+                onClick={() => onUpdateField("gender", 1)}
+                className={`cursor-pointer py-1 text-xs font-medium rounded-[4px] fast-transition text-center ${
+                  Number(character.gender ?? 0) === 1
+                    ? "bg-white dark:bg-[#1E1E1E] text-pink-600 dark:text-pink-400 font-semibold shadow-xs"
+                    : "text-neutral-500 hover:text-neutral-900 dark:text-neutral-400"
+                }`}
+              >
+                Female
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-[11px] font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400 mb-1.5">
+              Age
+            </label>
+            <div className="relative">
+              <input
+                type="number"
+                min="1"
+                max="100"
+                value={character.age ?? 30}
+                onChange={(e) => onUpdateField("age", parseInt(e.target.value, 10) || 0)}
+                className="w-full bg-white dark:bg-white/[0.03] border border-black/[0.12] dark:border-white/[0.12] text-neutral-900 dark:text-[#EDEDED] text-xs sm:text-sm rounded-[6px] px-3.5 py-2 custom-focus fast-transition tabular-nums"
+              />
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 text-[11px] pointer-events-none">
+                yrs
+              </span>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* View Switcher: Powers vs Amounts */}
-      <div className="flex items-center gap-3 border-b border-black/[0.08] dark:border-white/[0.08] pb-3">
-        <div className="inline-flex p-1 bg-black/[0.04] dark:bg-white/[0.04] border border-black/[0.06] dark:border-white/[0.06] rounded-[8px] text-xs">
+      {/* View Switcher: Powers vs Amounts vs Physique vs All */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-black/[0.08] dark:border-white/[0.08] pb-3">
+        <div className="inline-flex p-1 bg-black/[0.04] dark:bg-white/[0.04] border border-black/[0.06] dark:border-white/[0.06] rounded-[8px] text-xs flex-wrap">
+          <button
+            type="button"
+            onClick={() => setEditorSection("all")}
+            className={`cursor-pointer px-3 py-1.5 rounded-[6px] font-medium flex items-center gap-1.5 fast-transition ${
+              editorSection === "all"
+                ? "bg-white dark:bg-[#1E1E1E] text-neutral-900 dark:text-[#EDEDED] shadow-xs"
+                : "text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-[#EDEDED]"
+            }`}
+          >
+            <span>All</span>
+          </button>
           <button
             type="button"
             onClick={() => setEditorSection("powers")}
@@ -383,30 +391,58 @@ export function CharacterEditor({
             }`}
           >
             <Icon name="sliders" className="w-3.5 h-3.5 text-cyan-500" />
-            <span>Power Amounts & Sliders</span>
+            <span>Power Amounts</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setEditorSection("physique")}
+            className={`cursor-pointer px-3 py-1.5 rounded-[6px] font-medium flex items-center gap-1.5 fast-transition ${
+              editorSection === "physique"
+                ? "bg-white dark:bg-[#1E1E1E] text-neutral-900 dark:text-[#EDEDED] shadow-xs"
+                : "text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-[#EDEDED]"
+            }`}
+          >
+            <Icon name="user" className="w-3.5 h-3.5 text-emerald-500" />
+            <span>Physique & Body</span>
           </button>
         </div>
       </div>
 
-      {/* Power Amounts & Sliders Section */}
-      {editorSection === "amounts" && (
+      {/* Physique & Body Scale Section */}
+      {(editorSection === "physique" || editorSection === "all") && (
         <div className="space-y-3">
-          <div>
-            <h3 className="text-lg sm:text-xl font-medium tracking-[-0.02em] text-neutral-900 dark:text-[#EDEDED]">
-              Power Amounts & Sliders
-            </h3>
-          </div>
+          <h3 className="text-lg sm:text-xl font-medium tracking-[-0.02em] text-neutral-900 dark:text-[#EDEDED]">
+            Physique & Body
+          </h3>
 
-          <PowerAmountEditor
+          <PhysiqueEditor
             character={character}
-            onUpdateStat={onUpdateStat}
+            timeMachineChar={timeMachineChar}
+            rosterType={rosterType}
             onUpdateField={onUpdateField}
           />
         </div>
       )}
 
+      {/* Power Amounts & Sliders Section */}
+      {(editorSection === "amounts" || editorSection === "all") && (
+        <div className="space-y-3">
+          <h3 className="text-lg sm:text-xl font-medium tracking-[-0.02em] text-neutral-900 dark:text-[#EDEDED]">
+            Power Amounts
+          </h3>
+
+          <PowerAmountEditor
+            character={character}
+            timeMachineChar={timeMachineChar}
+            rosterType={rosterType}
+            onUpdateStat={onUpdateStat}
+            onBatchUpdateStats={onBatchUpdateStats}
+          />
+        </div>
+      )}
+
       {/* Superpower Attributes Grid */}
-      {editorSection === "powers" && (
+      {(editorSection === "powers" || editorSection === "all") && (
         <div>
           <div className="mb-4">
             <h3 className="text-lg sm:text-xl font-medium tracking-[-0.02em] text-neutral-900 dark:text-[#EDEDED]">
@@ -426,8 +462,6 @@ export function CharacterEditor({
               // Projectile Limb Special Layout
               if (fieldKey === "projectileLimb") {
                 const currentLimb0 = getLimbSlot(0);
-                const currentLimb1 = getLimbSlot(1);
-                const currentLimb2 = getLimbSlot(2);
 
                 return (
                   <div
@@ -459,7 +493,7 @@ export function CharacterEditor({
                       </div>
 
                       {limbEditMode === "symmetric" ? (
-                        <div className="space-y-2">
+                        <div>
                           <PowerDropdown
                             value={currentLimb0}
                             meta={meta}
@@ -474,12 +508,6 @@ export function CharacterEditor({
                             onClose={() => setActiveDropdown(null)}
                             onChange={(newVal) => handleLimbChange(0, newVal)}
                           />
-                          <div className="text-[11px] text-neutral-500 dark:text-neutral-400 flex items-center justify-between">
-                            <span>Symmetric across slots 0, 1, 2</span>
-                            <span className="font-mono text-neutral-700 dark:text-neutral-300 tabular-nums">
-                              [{currentLimb0}, {currentLimb1}, {currentLimb2}]
-                            </span>
-                          </div>
                         </div>
                       ) : (
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
@@ -487,8 +515,8 @@ export function CharacterEditor({
                             const slotKey = `projectileLimb-slot-${slot}`;
                             return (
                               <div key={slot} className="space-y-1">
-                                <span className="text-[10px] font-mono text-neutral-400 dark:text-neutral-500">
-                                  Slot {slot}
+                                <span className="text-[10px] text-neutral-400 dark:text-neutral-500 font-medium">
+                                  Limb {slot + 1}
                                 </span>
                                 <PowerDropdown
                                   value={getLimbSlot(slot)}
@@ -551,7 +579,7 @@ export function CharacterEditor({
                               parseInt(e.target.value, 10) || 0,
                             )
                           }
-                          placeholder="Enter integer ID"
+                          placeholder="Enter custom value"
                           className="w-full bg-white dark:bg-white/[0.03] border border-black/[0.12] dark:border-white/[0.12] text-neutral-900 dark:text-[#EDEDED] text-xs rounded-[6px] px-3 py-2 custom-focus fast-transition font-mono"
                         />
                       </div>
@@ -585,14 +613,9 @@ export function CharacterEditor({
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
           {/* Health: Current / Max */}
           <div className="bg-black/[0.02] dark:bg-white/[0.02] p-3 rounded-[8px] border border-black/[0.06] dark:border-white/[0.06] space-y-1.5">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-neutral-500 dark:text-neutral-400">
-                Health
-              </span>
-              <span className="text-[10px] text-neutral-400 dark:text-neutral-500 font-mono">
-                Current / Max
-              </span>
-            </div>
+            <span className="text-xs font-medium text-neutral-500 dark:text-neutral-400 block">
+              Health / Max
+            </span>
             <div className="flex items-center gap-1.5">
               <input
                 type="number"
@@ -628,14 +651,9 @@ export function CharacterEditor({
 
           {/* Energy (Spirit) */}
           <div className="bg-black/[0.02] dark:bg-white/[0.02] p-3 rounded-[8px] border border-black/[0.06] dark:border-white/[0.06] space-y-1.5">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-neutral-500 dark:text-neutral-400">
-                Spirit
-              </span>
-              <span className="text-[10px] text-neutral-400 dark:text-neutral-500 font-mono">
-                0 - 100+
-              </span>
-            </div>
+            <span className="text-xs font-medium text-neutral-500 dark:text-neutral-400 block">
+              Spirit
+            </span>
             <input
               type="number"
               step="any"
@@ -653,16 +671,9 @@ export function CharacterEditor({
 
           {/* Status: Healthy / Injured / Deceased */}
           <div className="bg-black/[0.02] dark:bg-white/[0.02] p-3 rounded-[8px] border border-black/[0.06] dark:border-white/[0.06] space-y-1.5">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-neutral-500 dark:text-neutral-400">
-                Status
-              </span>
-              {Boolean(character.injury) && !character.dead && (
-                <span className="text-[10px] text-amber-600 dark:text-amber-400 font-mono">
-                  Injury ID
-                </span>
-              )}
-            </div>
+            <span className="text-xs font-medium text-neutral-500 dark:text-neutral-400 block">
+              Status
+            </span>
             <div className="flex items-center gap-1.5">
               <select
                 value={

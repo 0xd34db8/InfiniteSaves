@@ -94,7 +94,8 @@ export const POWER_MAPPINGS = {
       { id: 41, label: "Insemination", badge: "Verified" },
       { id: 31, label: "Kinetic Slam", badge: "Observed" },
       { id: 32, label: "Chain", badge: "Observed" },
-      { id: 23, label: "Grinder Crush Hold", badge: "Observed" },
+      { id: 23, label: "Petrification", badge: "Observed" },
+      { id: 21, label: "Wind", badge: "Observed" },
     ],
     observed: [
       -21, -20, -18, -17, -16, -15, -14, -13, -11, -10, -7, -6, -3, -2, 0, 2, 9,
@@ -105,7 +106,7 @@ export const POWER_MAPPINGS = {
   powerManipulate: {
     key: "powerManipulate",
     name: "Interact Power",
-    shortDesc: "Touch-based interaction or environmental elemental triggers",
+    shortDesc: "environmental interaction",
     icon: "wand",
     proven: [
       { id: 0, label: "None", badge: "Standard" },
@@ -116,7 +117,7 @@ export const POWER_MAPPINGS = {
       { id: 1593, label: "Fire Manipulation", badge: "Observed" },
       {
         id: 10000,
-        label: "Absolute Manipulation (God Mode)",
+        label: "Invisibility",
         badge: "Observed",
       },
     ],
@@ -135,11 +136,12 @@ export const POWER_MAPPINGS = {
     proven: [
       { id: 0, label: "None", badge: "Standard" },
       { id: 55, label: "Random Form Shift", badge: "Verified" },
-      { id: 69, label: "Permanent Alter-Ego", badge: "Verified" },
-      { id: 120, label: "Costume Morph 120", badge: "Observed" },
+      { id: 69, label: "Permanent", badge: "Verified" },
+      { id: 120, label: "Costume Morph", badge: "Observed" },
       { id: -120, label: "Costume Morph -120", badge: "Observed" },
-      { id: -500, label: "Mecha Armor Shift (-500)", badge: "Observed" },
-      { id: 838, label: "Beast Morph 838", badge: "Observed" },
+      { id: -500, label: "Inactive/Mecha", badge: "Observed" },
+      { id: 838, label: "Beast Morph", badge: "Observed" },
+      { id: 70, label: "Hold", badge: "Observed" },
     ],
     observed: [
       -838, -600, -500, -400, -300, -200, -120, -100, -70, -69, -68, -60, -55,
@@ -151,7 +153,7 @@ export const POWER_MAPPINGS = {
   weakness: {
     key: "weakness",
     name: "Weakness",
-    shortDesc: "Vulnerability or lethal kryptonite-like condition",
+    shortDesc: "Vulnerability",
     icon: "shield-alert",
     proven: [
       { id: 0, label: "None (Immune)", badge: "Verified" },
@@ -429,15 +431,91 @@ export function formatPowerValue(fieldKey, value) {
     return `${Number(value).toFixed(1)}%`;
   }
 
+  if (fieldKey === "gender") {
+    return Number(value) === 1 ? "Female" : "Male";
+  }
+
+  if (fieldKey === "height") {
+    const val = Number(value);
+    const inches = val * 72;
+    const feet = Math.floor(inches / 12);
+    const remInches = Math.round(inches % 12);
+    return `${val.toFixed(2)}x (~${feet}'${remInches}")`;
+  }
+
+  if (fieldKey === "muscleMass") {
+    return `${Number(value).toFixed(1)}% Muscle`;
+  }
+
+  if (
+    fieldKey === "bodyMass" ||
+    fieldKey === "armMass" ||
+    fieldKey === "legMass"
+  ) {
+    const num = Number(value);
+    const sign = num > 0 ? "+" : "";
+    return `${sign}${num.toFixed(1)}%`;
+  }
+
+  if (fieldKey === "headSize") {
+    return `${Number(value).toFixed(2)}x Head`;
+  }
+
+  if (fieldKey === "age") {
+    return `${value} yrs`;
+  }
+
+  if (fieldKey === "voice") {
+    return `${Number(value).toFixed(2)}x Pitch`;
+  }
+
+  if (fieldKey === "gender") {
+    return Number(value) === 1 ? "Female" : "Male";
+  }
+
+  if (fieldKey === "height") {
+    const val = Number(value);
+    const inches = val * 72;
+    const feet = Math.floor(inches / 12);
+    const remInches = Math.round(inches % 12);
+    return `${val.toFixed(2)}x (~${feet}'${remInches}")`;
+  }
+
+  if (fieldKey === "muscleMass") {
+    return `${Number(value).toFixed(1)}% Muscle`;
+  }
+
+  if (
+    fieldKey === "bodyMass" ||
+    fieldKey === "armMass" ||
+    fieldKey === "legMass"
+  ) {
+    const num = Number(value);
+    const sign = num > 0 ? "+" : "";
+    return `${sign}${num.toFixed(1)}%`;
+  }
+
+  if (fieldKey === "headSize") {
+    return `${Number(value).toFixed(2)}x Head`;
+  }
+
+  if (fieldKey === "age") {
+    return `${value} yrs`;
+  }
+
+  if (fieldKey === "voice") {
+    return `${Number(value).toFixed(2)}x Pitch`;
+  }
+
   const field = POWER_MAPPINGS[fieldKey];
   if (!field) return String(value);
 
   const matched = field.proven.find((p) => p.id === Number(value));
   if (matched) {
-    return `${matched.label.split("(")[0].trim()} (ID: ${value})`;
+    return cleanPowerLabel(matched.label);
   }
 
-  return `Custom ID: ${value}`;
+  return `Custom (${value})`;
 }
 
 export function isCharacterPowered(char) {

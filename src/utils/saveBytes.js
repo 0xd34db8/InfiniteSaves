@@ -133,6 +133,45 @@ export function parseSaveBytes(buffer) {
     const teamOffset = p + 12;
     const team = view.getInt32(teamOffset, true);
 
+    // Find body/physicality fields (gender, height, age, headSize, bodyMass, muscleMass, armMass, legMass)
+    let gender = 0;
+    let height = 1.0;
+    let age = 30;
+    let headSize = 1.0;
+    let bodyMass = 0;
+    let muscleMass = 50;
+    let armMass = 0;
+    let legMass = 0;
+    const bodyOffsets = {};
+
+    for (let k = p + 16; k < Math.min(start + 160, nextBoundary - 32); k++) {
+      const g = view.getInt32(k, true);
+      const h = view.getFloat32(k + 4, true);
+      const a = view.getInt32(k + 8, true);
+      const hs = view.getFloat32(k + 12, true);
+
+      if ((g === 0 || g === 1) && h >= 0.15 && h <= 2.5 && a >= 1 && a <= 120 && hs >= 0.7 && hs <= 2.0) {
+        gender = g;
+        height = h;
+        age = a;
+        headSize = hs;
+        bodyMass = view.getFloat32(k + 16, true);
+        muscleMass = view.getFloat32(k + 20, true);
+        armMass = view.getFloat32(k + 24, true);
+        legMass = view.getFloat32(k + 28, true);
+
+        bodyOffsets.gender = k;
+        bodyOffsets.height = k + 4;
+        bodyOffsets.age = k + 8;
+        bodyOffsets.headSize = k + 12;
+        bodyOffsets.bodyMass = k + 16;
+        bodyOffsets.muscleMass = k + 20;
+        bodyOffsets.armMass = k + 24;
+        bodyOffsets.legMass = k + 28;
+        break;
+      }
+    }
+
     // Find vitals by scanning for 4 consecutive MemberReferences (\x09 <4B> * 4 = 20B) between start and start+250
     let healthOffset = -1;
     for (let k = start + 20; k < Math.min(start + 260, nextBoundary - 40); k++) {
@@ -201,6 +240,14 @@ export function parseSaveBytes(buffer) {
       role,
       demeanour,
       team,
+      gender,
+      height,
+      age,
+      headSize,
+      bodyMass,
+      muscleMass,
+      armMass,
+      legMass,
       health,
       healthLimit,
       spirit,
@@ -221,8 +268,10 @@ export function parseSaveBytes(buffer) {
 
     targetRoster[String(cid)] = charObj;
     targetOffsets[String(cid)] = {
+      voice: p,
       role: roleOffset,
       team: teamOffset,
+      ...bodyOffsets,
       ...vitalsOffsets,
       transform: transformOffset,
       powerAttack: powerAttackOffset,
@@ -329,6 +378,35 @@ export function patchSaveBytes(rawBuffer, offsets, currentSaveData) {
       }
       if (charOffsets.team !== undefined && charData.team !== undefined) {
         view.setInt32(charOffsets.team, Number(charData.team), true);
+      }
+
+      // Patch Body & Physicality
+      if (charOffsets.gender !== undefined && charData.gender !== undefined) {
+        view.setInt32(charOffsets.gender, Number(charData.gender), true);
+      }
+      if (charOffsets.height !== undefined && charData.height !== undefined) {
+        view.setFloat32(charOffsets.height, Number(charData.height), true);
+      }
+      if (charOffsets.age !== undefined && charData.age !== undefined) {
+        view.setInt32(charOffsets.age, Number(charData.age), true);
+      }
+      if (charOffsets.headSize !== undefined && charData.headSize !== undefined) {
+        view.setFloat32(charOffsets.headSize, Number(charData.headSize), true);
+      }
+      if (charOffsets.bodyMass !== undefined && charData.bodyMass !== undefined) {
+        view.setFloat32(charOffsets.bodyMass, Number(charData.bodyMass), true);
+      }
+      if (charOffsets.muscleMass !== undefined && charData.muscleMass !== undefined) {
+        view.setFloat32(charOffsets.muscleMass, Number(charData.muscleMass), true);
+      }
+      if (charOffsets.armMass !== undefined && charData.armMass !== undefined) {
+        view.setFloat32(charOffsets.armMass, Number(charData.armMass), true);
+      }
+      if (charOffsets.legMass !== undefined && charData.legMass !== undefined) {
+        view.setFloat32(charOffsets.legMass, Number(charData.legMass), true);
+      }
+      if (charOffsets.voice !== undefined && charData.voice !== undefined) {
+        view.setFloat32(charOffsets.voice, Number(charData.voice), true);
       }
     }
   }

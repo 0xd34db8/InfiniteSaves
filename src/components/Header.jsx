@@ -30,22 +30,37 @@ export function Header({
   // Close dropdowns on outside click
   useEffect(() => {
     const handleClickOutside = (e) => {
-      if (themeDropdownRef.current && !themeDropdownRef.current.contains(e.target)) {
+      if (
+        themeDropdownRef.current &&
+        !themeDropdownRef.current.contains(e.target)
+      ) {
         setIsThemeMenuOpen(false);
       }
-      if (exportDropdownRef.current && !exportDropdownRef.current.contains(e.target)) {
+      if (
+        exportDropdownRef.current &&
+        !exportDropdownRef.current.contains(e.target)
+      ) {
         setIsExportMenuOpen(false);
       }
       if (mobileMenuRef.current && !mobileMenuRef.current.contains(e.target)) {
         setIsMobileMenuOpen(false);
       }
-      if (mobileExportRef.current && !mobileExportRef.current.contains(e.target)) {
+      if (
+        mobileExportRef.current &&
+        !mobileExportRef.current.contains(e.target)
+      ) {
         setIsMobileExportOpen(false);
       }
     };
-    if (isThemeMenuOpen || isExportMenuOpen || isMobileMenuOpen || isMobileExportOpen) {
+    if (
+      isThemeMenuOpen ||
+      isExportMenuOpen ||
+      isMobileMenuOpen ||
+      isMobileExportOpen
+    ) {
       document.addEventListener("mousedown", handleClickOutside);
-      return () => document.removeEventListener("mousedown", handleClickOutside);
+      return () =>
+        document.removeEventListener("mousedown", handleClickOutside);
     }
   }, [isThemeMenuOpen, isExportMenuOpen, isMobileMenuOpen, isMobileExportOpen]);
 
@@ -81,7 +96,9 @@ export function Header({
               )}
               {changesCount > 0 && (
                 <span className="hidden sm:inline-flex text-[10px] sm:text-[11px] font-medium tracking-[0.02em] px-1.5 sm:px-2 py-0.5 rounded-[6px] bg-amber-500/[0.08] text-amber-700 dark:text-amber-300 border border-amber-500/[0.2] shrink-0">
-                  {changesCount} <span className="hidden xs:inline">unsaved</span> {changesCount === 1 ? "edit" : "edits"}
+                  {changesCount}{" "}
+                  <span className="hidden xs:inline">unsaved</span>{" "}
+                  {changesCount === 1 ? "edit" : "edits"}
                 </span>
               )}
             </div>
@@ -100,11 +117,21 @@ export function Header({
                 title={`Theme: ${themePreference === "system" ? `System (${effectiveTheme})` : effectiveTheme}. Click to cycle themes.`}
               >
                 <Icon
-                  name={effectiveTheme === "crimson" ? "flame" : effectiveTheme === "dark" ? "moon" : "sun"}
+                  name={
+                    effectiveTheme === "crimson"
+                      ? "flame"
+                      : effectiveTheme === "dark"
+                        ? "moon"
+                        : "sun"
+                  }
                   className={`w-3.5 h-3.5 ${effectiveTheme === "crimson" ? "text-rose-400" : ""}`}
                 />
                 <span className="capitalize">
-                  {themePreference === "system" ? "Auto" : effectiveTheme === "crimson" ? "Crimson" : effectiveTheme}
+                  {themePreference === "system"
+                    ? "Auto"
+                    : effectiveTheme === "crimson"
+                      ? "Crimson"
+                      : effectiveTheme}
                 </span>
               </button>
               <button
@@ -136,7 +163,9 @@ export function Header({
                   <span className="flex items-center gap-2">
                     <Icon name="sun" className="w-3.5 h-3.5" /> Light
                   </span>
-                  {themePreference === "light" && <Icon name="check" className="w-3.5 h-3.5" />}
+                  {themePreference === "light" && (
+                    <Icon name="check" className="w-3.5 h-3.5" />
+                  )}
                 </button>
                 <button
                   type="button"
@@ -153,7 +182,9 @@ export function Header({
                   <span className="flex items-center gap-2">
                     <Icon name="moon" className="w-3.5 h-3.5" /> Dark
                   </span>
-                  {themePreference === "dark" && <Icon name="check" className="w-3.5 h-3.5" />}
+                  {themePreference === "dark" && (
+                    <Icon name="check" className="w-3.5 h-3.5" />
+                  )}
                 </button>
                 <button
                   type="button"
@@ -168,9 +199,12 @@ export function Header({
                   }`}
                 >
                   <span className="flex items-center gap-2">
-                    <Icon name="flame" className="w-3.5 h-3.5 text-rose-400" /> Crimson (Red/Black)
+                    <Icon name="flame" className="w-3.5 h-3.5 text-rose-400" />{" "}
+                    Crimson (Red/Black)
                   </span>
-                  {themePreference === "crimson" && <Icon name="check" className="w-3.5 h-3.5 text-rose-400" />}
+                  {themePreference === "crimson" && (
+                    <Icon name="check" className="w-3.5 h-3.5 text-rose-400" />
+                  )}
                 </button>
                 <button
                   type="button"
@@ -185,9 +219,12 @@ export function Header({
                   }`}
                 >
                   <span className="flex items-center gap-2">
-                    <Icon name="monitor" className="w-3.5 h-3.5" /> System (Auto)
+                    <Icon name="monitor" className="w-3.5 h-3.5" /> System
+                    (Auto)
                   </span>
-                  {themePreference === "system" && <Icon name="check" className="w-3.5 h-3.5" />}
+                  {themePreference === "system" && (
+                    <Icon name="check" className="w-3.5 h-3.5" />
+                  )}
                 </button>
               </div>
             )}
@@ -196,7 +233,9 @@ export function Header({
           {/* Upload Button */}
           <label className="cursor-pointer text-xs font-medium px-2.5 sm:px-3 py-1.5 min-h-[32px] bg-black/[0.04] hover:bg-black/[0.08] dark:bg-white/[0.04] dark:hover:bg-white/[0.08] text-neutral-700 dark:text-neutral-200 border border-black/[0.08] dark:border-white/[0.08] rounded-[8px] flex items-center gap-1.5 fast-transition active:scale-[0.98]">
             <Icon name="upload" className="w-3.5 h-3.5 shrink-0" />
-            <span>Upload<span className="hidden lg:inline"> Save</span></span>
+            <span>
+              Upload<span className="hidden lg:inline"> Save</span>
+            </span>
             <input
               type="file"
               accept=".bytes,.txt,.json"
@@ -216,7 +255,7 @@ export function Header({
             }`}
           >
             <Icon name="history" className="w-3.5 h-3.5 shrink-0" />
-            <span>Audit ({changesCount})</span>
+            <span>Changes ({changesCount})</span>
           </button>
 
           {/* Guide Button */}
@@ -244,7 +283,9 @@ export function Header({
               title="Download game-ready Save.bytes"
             >
               <Icon name="download" className="w-3.5 h-3.5 shrink-0" />
-              <span>Export<span className="hidden lg:inline"> Save.bytes</span></span>
+              <span>
+                Export<span className="hidden lg:inline"> Save.bytes</span>
+              </span>
             </button>
             <button
               type="button"
@@ -271,7 +312,9 @@ export function Header({
                   className="w-full px-3 py-2 flex items-center justify-between text-left hover:bg-black/[0.04] dark:hover:bg-white/[0.06] text-neutral-900 dark:text-[#EDEDED] fast-transition cursor-pointer"
                 >
                   <span className="font-medium">Direct Save.bytes</span>
-                  <span className="text-[10px] font-mono text-emerald-600 dark:text-emerald-400">Binary</span>
+                  <span className="text-[10px] font-mono text-emerald-600 dark:text-emerald-400">
+                    Binary
+                  </span>
                 </button>
                 <button
                   type="button"
@@ -282,7 +325,9 @@ export function Header({
                   className="w-full px-3 py-2 flex items-center justify-between text-left hover:bg-black/[0.04] dark:hover:bg-white/[0.06] text-neutral-900 dark:text-[#EDEDED] fast-transition cursor-pointer border-t border-black/[0.06] dark:border-white/[0.06]"
                 >
                   <span>Raw JSON (.txt)</span>
-                  <span className="text-[10px] font-mono text-neutral-400">Text</span>
+                  <span className="text-[10px] font-mono text-neutral-400">
+                    Text
+                  </span>
                 </button>
               </div>
             )}
@@ -333,7 +378,9 @@ export function Header({
                   className="w-full px-3 py-2 flex items-center justify-between text-left hover:bg-black/[0.04] dark:hover:bg-white/[0.06] text-neutral-900 dark:text-[#EDEDED] fast-transition cursor-pointer"
                 >
                   <span className="font-medium">Direct Save.bytes</span>
-                  <span className="text-[10px] font-mono text-emerald-600 dark:text-emerald-400">Binary</span>
+                  <span className="text-[10px] font-mono text-emerald-600 dark:text-emerald-400">
+                    Binary
+                  </span>
                 </button>
                 <button
                   type="button"
@@ -344,7 +391,9 @@ export function Header({
                   className="w-full px-3 py-2 flex items-center justify-between text-left hover:bg-black/[0.04] dark:hover:bg-white/[0.06] text-neutral-900 dark:text-[#EDEDED] fast-transition cursor-pointer border-t border-black/[0.06] dark:border-white/[0.06]"
                 >
                   <span>Raw JSON (.txt)</span>
-                  <span className="text-[10px] font-mono text-neutral-400">Text</span>
+                  <span className="text-[10px] font-mono text-neutral-400">
+                    Text
+                  </span>
                 </button>
               </div>
             )}
@@ -369,7 +418,10 @@ export function Header({
               <div className="absolute right-0 top-full mt-1.5 w-60 py-1.5 bg-white dark:bg-[#141414] border border-black/[0.12] dark:border-white/[0.12] rounded-[10px] shadow-xl z-50 text-xs">
                 {/* Upload File */}
                 <label className="w-full px-3.5 py-2.5 flex items-center gap-2.5 text-neutral-800 dark:text-[#EDEDED] hover:bg-black/[0.04] dark:hover:bg-white/[0.06] cursor-pointer fast-transition">
-                  <Icon name="upload" className="w-4 h-4 text-neutral-500 dark:text-neutral-400 shrink-0" />
+                  <Icon
+                    name="upload"
+                    className="w-4 h-4 text-neutral-500 dark:text-neutral-400 shrink-0"
+                  />
                   <span className="font-medium">Upload Save File</span>
                   <input
                     type="file"
@@ -392,7 +444,10 @@ export function Header({
                   className="w-full px-3.5 py-2.5 flex items-center justify-between text-neutral-800 dark:text-[#EDEDED] hover:bg-black/[0.04] dark:hover:bg-white/[0.06] cursor-pointer fast-transition text-left"
                 >
                   <span className="flex items-center gap-2.5 font-medium">
-                    <Icon name="history" className="w-4 h-4 text-neutral-500 dark:text-neutral-400 shrink-0" />
+                    <Icon
+                      name="history"
+                      className="w-4 h-4 text-neutral-500 dark:text-neutral-400 shrink-0"
+                    />
                     Audit Log
                   </span>
                   <span
@@ -415,7 +470,10 @@ export function Header({
                   }}
                   className="w-full px-3.5 py-2.5 flex items-center gap-2.5 text-neutral-800 dark:text-[#EDEDED] hover:bg-black/[0.04] dark:hover:bg-white/[0.06] cursor-pointer fast-transition text-left"
                 >
-                  <Icon name="help" className="w-4 h-4 text-neutral-500 dark:text-neutral-400 shrink-0" />
+                  <Icon
+                    name="help"
+                    className="w-4 h-4 text-neutral-500 dark:text-neutral-400 shrink-0"
+                  />
                   <span className="font-medium">User Guide</span>
                 </button>
 
@@ -473,8 +531,13 @@ export function Header({
                       }`}
                       title="Crimson Theme"
                     >
-                      <Icon name="flame" className="w-3.5 h-3.5 text-rose-500" />
-                      <span className="text-[9px] mt-0.5 text-rose-500">Red</span>
+                      <Icon
+                        name="flame"
+                        className="w-3.5 h-3.5 text-rose-500"
+                      />
+                      <span className="text-[9px] mt-0.5 text-rose-500">
+                        Red
+                      </span>
                     </button>
                     <button
                       type="button"

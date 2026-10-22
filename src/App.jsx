@@ -411,6 +411,44 @@ export default function App() {
     logChangeEntry(entry);
   };
 
+  // Batch update multiple stats or superStats at once
+  const handleBatchUpdateStats = (statType, updatedStats) => {
+    if (!saveData || !selectedCharacter || !updatedStats) return;
+
+    const changes = [];
+    setSaveData((prev) => {
+      const copy = { ...prev };
+      copy[rosterType] = { ...copy[rosterType] };
+      const char = { ...copy[rosterType][selectedId] };
+      char[statType] = { ...(char[statType] || {}) };
+
+      Object.entries(updatedStats).forEach(([key, val]) => {
+        const newVal = Number(val);
+        const oldVal = char[statType][key] ?? 100;
+        if (oldVal !== newVal) {
+          char[statType][key] = newVal;
+          changes.push({
+            id: Date.now() + Math.random(),
+            charId: selectedId,
+            charName: char.name || "Unknown",
+            field: `${statType}.${key}`,
+            oldVal,
+            newVal,
+            timestamp: Date.now(),
+            roster: rosterType,
+          });
+        }
+      });
+
+      copy[rosterType][selectedId] = char;
+      return copy;
+    });
+
+    if (changes.length > 0) {
+      setChangesLog((prev) => [...changes, ...prev]);
+    }
+  };
+
   // Clone powers from Time Machine
   const handleCloneFromTimeMachine = () => {
     if (!saveData || !selectedCharacter || !timeMachineChar) return;
@@ -476,13 +514,45 @@ export default function App() {
         });
       }
 
+      // Also clone physique & body traits
+      const physiqueFields = [
+        "gender",
+        "height",
+        "age",
+        "muscleMass",
+        "bodyMass",
+        "armMass",
+        "legMass",
+        "headSize",
+        "voice",
+      ];
+      physiqueFields.forEach((f) => {
+        if (timeMachineChar[f] !== undefined) {
+          const oldVal = sc[f];
+          const newVal = timeMachineChar[f];
+          if (oldVal !== newVal) {
+            sc[f] = newVal;
+            changes.push({
+              id: Date.now() + Math.random(),
+              charId: selectedId,
+              charName: sc.name || "Unknown",
+              field: f,
+              oldVal,
+              newVal,
+              timestamp: Date.now(),
+              roster: "savedChars",
+            });
+          }
+        }
+      });
+
       copy.savedChars[selectedId] = sc;
       return copy;
     });
 
     setChangesLog((prev) => [...changes, ...prev]);
     showToast(
-      `Successfully cloned all powers and power amounts from Time Machine for ${selectedCharacter.name}!`,
+      `Successfully cloned all powers, amounts, and physique from Time Machine for ${selectedCharacter.name}!`,
       "success",
     );
   };
@@ -901,6 +971,7 @@ export default function App() {
             onUpdateField={handleUpdateField}
             onUpdateLimb={handleUpdateLimb}
             onUpdateStat={handleUpdateStat}
+            onBatchUpdateStats={handleBatchUpdateStats}
             onCloneFromTimeMachine={handleCloneFromTimeMachine}
             onOpenPresets={() => setIsPresetOpen(true)}
             onOpenCompare={() => setIsCompareOpen(true)}
