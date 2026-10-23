@@ -82,7 +82,7 @@ export const POWER_MAPPINGS = {
       { id: 13, label: "Weapon Specialist", badge: "Observed" },
     ],
     observed: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
-    tip: "Passive perks like infinite ammo or passive damage reduction.",
+    tip: "Passive perks like infinite ammo.",
   },
   powerGrapple: {
     key: "powerGrapple",
@@ -92,7 +92,7 @@ export const POWER_MAPPINGS = {
     proven: [
       { id: 0, label: "None", badge: "Standard" },
       { id: 41, label: "Insemination", badge: "Verified" },
-      { id: 31, label: "Kinetic Slam", badge: "Observed" },
+      { id: 31, label: "Rope", badge: "Observed" },
       { id: 32, label: "Chain", badge: "Observed" },
       { id: 23, label: "Petrification", badge: "Observed" },
       { id: 21, label: "Wind", badge: "Observed" },
@@ -251,7 +251,7 @@ export const STAT_MAPPINGS = [
 // Power presets for 1-click loadout testing
 export const POWER_PRESETS = [
   {
-    name: "Homelander / Rocket Overlord",
+    name: "Rocket Overlord",
     description:
       "Full end-game loadout of Julian's Time Machine snapshot with max power amounts",
     badge: "Rosetta Stone",
@@ -280,7 +280,7 @@ export const POWER_PRESETS = [
     },
   },
   {
-    name: "Laser Android (Alex Faux Style)",
+    name: "Laser Android",
     description: "Eye beam lasers, synthetic durability, and hover levitation",
     badge: "Sci-Fi",
     loadout: {

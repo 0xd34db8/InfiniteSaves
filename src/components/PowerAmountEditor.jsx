@@ -13,7 +13,11 @@ export function PowerAmountEditor({
 
   if (!character) return null;
 
-  const currentStats = (activeStatTab === "superStat" ? character.superStat : character.stat) || {};
+  const fallbackStats = activeStatTab === "superStat"
+    ? { "0": 100, "1": 100, "2": 100, "3": 100, "4": 100, "5": 100, "6": 100 }
+    : { "0": 100, "1": 100, "2": 100, "3": 100, "4": 100, "5": 100, "6": 100, "7": 100, "8": 100 };
+  const rawStats = (activeStatTab === "superStat" ? character.superStat : character.stat) || {};
+  const currentStats = Object.keys(rawStats).length > 0 ? rawStats : fallbackStats;
   const availableKeys = Object.keys(currentStats).sort((a, b) => Number(a) - Number(b));
 
   // Quick preset booster for all stats in active tab

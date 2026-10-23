@@ -12,15 +12,16 @@ export function parseSaveBytes(buffer) {
   const view = new DataView(buffer);
   const totalLen = bytes.length;
 
-  // 1. Index all 3-int limb arrays (RecordType 15 = ArraySinglePrimitive)
-  // Structure: 0x0f <obj_id: 4B uint32> <length: 4B uint32 = 3> <prim_type: 1B uint8 = 8> <slot0: 4B int32> <slot1: 4B int32> <slot2: 4B int32>
+  // 1. Index all 3-int limb arrays and float stat/superStat arrays (RecordType 15 = ArraySinglePrimitive)
+  // Structure: 0x0f <obj_id: 4B uint32> <length: 4B uint32> <prim_type: 1B uint8> <payload...>
   const limbArrays = new Map();
-  for (let i = 0; i <= totalLen - 22; i++) {
+  const statArrays = new Map();
+  for (let i = 0; i <= totalLen - 10; i++) {
     if (bytes[i] === 0x0f) {
       const objId = view.getUint32(i + 1, true);
       const len = view.getUint32(i + 5, true);
       const primType = bytes[i + 9];
-      if (len === 3 && primType === 8) {
+      if (len === 3 && primType === 8 && i + 22 <= totalLen) {
         const offset0 = i + 10;
         const s0 = view.getInt32(offset0, true);
         const s1 = view.getInt32(offset0 + 4, true);
@@ -30,7 +31,81 @@ export function parseSaveBytes(buffer) {
           slots: { "0": s0, "1": s1, "2": s2 },
         });
         i += 21; // skip array payload
+      } else if (primType === 11 && len >= 1 && len <= 20 && i + 10 + len * 4 <= totalLen) {
+        const offsets = [];
+        const values = {};
+        const offset0 = i + 10;
+        for (let s = 0; s < len; s++) {
+          offsets.push(offset0 + s * 4);
+          values[String(s)] = view.getFloat32(offset0 + s * 4, true);
+        }
+        statArrays.set(objId, {
+          len,
+          offsets,
+          values,
+        });
+        i += 9 + len * 4;
       }
+    }
+  }
+
+  // 1b. Index all Costume records (Civilian = Costume 1, Super = Costume 2)
+  // The MDickie game engine computes 3D bone scales and body morphs directly from Costume
+  let costumeMetaId = -1;
+  let firstCostumeOffset = -1;
+
+  for (let i = 0; i < totalLen - 20; i++) {
+    if (bytes[i] === 0x05) {
+      const objId = view.getInt32(i + 1, true);
+      const p = i + 5;
+      const strLen = bytes[p];
+      if (strLen === 7) {
+        const str = new TextDecoder("utf-8").decode(bytes.subarray(p + 1, p + 8));
+        if (str === "Costume") {
+          costumeMetaId = objId;
+          for (let k = p + 8; k < p + 300 && k + 4 <= totalLen; k++) {
+            if (bytes[k] === 0x02 && bytes[k + 1] === 0x00 && bytes[k + 2] === 0x00 && bytes[k + 3] === 0x00) {
+              firstCostumeOffset = k + 4;
+              break;
+            }
+          }
+          break;
+        }
+      }
+    }
+  }
+
+  const savedCostumes = new Map();
+  const timeCostumes = new Map();
+
+  if (costumeMetaId !== -1 && firstCostumeOffset !== -1) {
+    const rawCostumes = [];
+    rawCostumes.push({
+      id: view.getInt32(firstCostumeOffset, true),
+      charID: view.getInt32(firstCostumeOffset + 4, true),
+      dataOffset: firstCostumeOffset,
+    });
+
+    for (let i = firstCostumeOffset + 70; i < totalLen - 20; i++) {
+      if (bytes[i] === 0x01 && view.getInt32(i + 5, true) === costumeMetaId) {
+        rawCostumes.push({
+          id: view.getInt32(i + 9, true),
+          charID: view.getInt32(i + 13, true),
+          dataOffset: i + 9,
+        });
+      }
+    }
+
+    const half = Math.floor(rawCostumes.length / 2);
+    for (let i = 0; i < half; i++) {
+      const c = rawCostumes[i];
+      if (!savedCostumes.has(c.charID)) savedCostumes.set(c.charID, []);
+      savedCostumes.get(c.charID).push(c);
+    }
+    for (let i = half; i < rawCostumes.length; i++) {
+      const c = rawCostumes[i];
+      if (!timeCostumes.has(c.charID)) timeCostumes.set(c.charID, []);
+      timeCostumes.get(c.charID).push(c);
     }
   }
 
@@ -172,8 +247,11 @@ export function parseSaveBytes(buffer) {
       }
     }
 
-    // Find vitals by scanning for 4 consecutive MemberReferences (\x09 <4B> * 4 = 20B) between start and start+250
+    // Find vitals & stats by scanning for 4 consecutive MemberReferences (\x09 <4B> * 4 = 20B) between start and start+250
+    // The references are: [costume, scar, stat, superStat] followed immediately by health, healthLimit, spirit, injury, dead
     let healthOffset = -1;
+    let statRef = -1;
+    let superStatRef = -1;
     for (let k = start + 20; k < Math.min(start + 260, nextBoundary - 40); k++) {
       if (
         bytes[k] === 0x09 &&
@@ -181,6 +259,8 @@ export function parseSaveBytes(buffer) {
         bytes[k + 10] === 0x09 &&
         bytes[k + 15] === 0x09
       ) {
+        statRef = view.getUint32(k + 11, true);
+        superStatRef = view.getUint32(k + 16, true);
         healthOffset = k + 20;
         break;
       }
@@ -206,6 +286,17 @@ export function parseSaveBytes(buffer) {
       vitalsOffsets.injury = healthOffset + 12;
       vitalsOffsets.dead = healthOffset + 16;
     }
+
+    const statInfo = statArrays.get(statRef);
+    const superStatInfo = statArrays.get(superStatRef);
+
+    const stat = statInfo
+      ? { ...statInfo.values }
+      : { "0": 100, "1": 100, "2": 100, "3": 100, "4": 100, "5": 100, "6": 100, "7": 100, "8": 100 };
+
+    const superStat = superStatInfo
+      ? { ...superStatInfo.values }
+      : { "0": 100, "1": 100, "2": 100, "3": 100, "4": 100, "5": 100, "6": 100 };
 
     // Read powers from the tail of the character block relative to nextBoundary
     const transformOffset = nextBoundary - 41;
@@ -262,9 +353,21 @@ export function parseSaveBytes(buffer) {
       powerCraft,
       powerInnate,
       weakness,
-      superStat: { "0": 100, "1": 100, "2": 100, "3": 100, "4": 100, "5": 100, "6": 100 },
-      stat: { "0": 100, "1": 100, "2": 100, "3": 100, "4": 100, "5": 100, "6": 100, "7": 100, "8": 100 },
+      superStat,
+      stat,
     };
+
+    const costumeList = (isSavedChars ? savedCostumes : timeCostumes).get(cid) || [];
+    const costumeOffsets = costumeList.map((c) => ({
+      costumeId: c.id,
+      gender: c.dataOffset + 42,
+      age: c.dataOffset + 46,
+      height: c.dataOffset + 50,
+      headSize: c.dataOffset + 54,
+      bodyMass: c.dataOffset + 58,
+      muscleMass: c.dataOffset + 62,
+      armMass: c.dataOffset + 66,
+    }));
 
     targetRoster[String(cid)] = charObj;
     targetOffsets[String(cid)] = {
@@ -282,6 +385,9 @@ export function parseSaveBytes(buffer) {
       powerInnate: powerInnateOffset,
       weakness: weaknessOffset,
       limbOffsets: limbInfo ? limbInfo.offsets : null,
+      statOffsets: statInfo ? statInfo.offsets : null,
+      superStatOffsets: superStatInfo ? superStatInfo.offsets : null,
+      costumeOffsets: costumeOffsets.length > 0 ? costumeOffsets : null,
     };
   }
 
@@ -407,6 +513,54 @@ export function patchSaveBytes(rawBuffer, offsets, currentSaveData) {
       }
       if (charOffsets.voice !== undefined && charData.voice !== undefined) {
         view.setFloat32(charOffsets.voice, Number(charData.voice), true);
+      }
+
+      // Patch Physicality on all linked Costume records (Civilian & Super Alter-Ego)
+      // The MDickie game engine computes 3D bone scales and body morphs directly from Costume
+      if (charOffsets.costumeOffsets && Array.isArray(charOffsets.costumeOffsets)) {
+        for (const cOffset of charOffsets.costumeOffsets) {
+          if (cOffset.gender !== undefined && charData.gender !== undefined) {
+            view.setInt32(cOffset.gender, Number(charData.gender), true);
+          }
+          if (cOffset.age !== undefined && charData.age !== undefined) {
+            view.setInt32(cOffset.age, Number(charData.age), true);
+          }
+          if (cOffset.height !== undefined && charData.height !== undefined) {
+            view.setFloat32(cOffset.height, Number(charData.height), true);
+          }
+          if (cOffset.headSize !== undefined && charData.headSize !== undefined) {
+            view.setFloat32(cOffset.headSize, Number(charData.headSize), true);
+          }
+          if (cOffset.bodyMass !== undefined && charData.bodyMass !== undefined) {
+            view.setFloat32(cOffset.bodyMass, Number(charData.bodyMass), true);
+          }
+          if (cOffset.muscleMass !== undefined && charData.muscleMass !== undefined) {
+            view.setFloat32(cOffset.muscleMass, Number(charData.muscleMass), true);
+          }
+          if (cOffset.armMass !== undefined && charData.armMass !== undefined) {
+            view.setFloat32(cOffset.armMass, Number(charData.armMass), true);
+          }
+        }
+      }
+
+      // Patch Power Amounts / Stats (float32 array)
+      if (charOffsets.statOffsets && charData.stat) {
+        for (let s = 0; s < charOffsets.statOffsets.length; s++) {
+          const val = charData.stat[String(s)] ?? charData.stat[s];
+          if (val !== undefined && !isNaN(val)) {
+            view.setFloat32(charOffsets.statOffsets[s], Number(val), true);
+          }
+        }
+      }
+
+      // Patch Power Amounts / SuperStats (float32 array)
+      if (charOffsets.superStatOffsets && charData.superStat) {
+        for (let s = 0; s < charOffsets.superStatOffsets.length; s++) {
+          const val = charData.superStat[String(s)] ?? charData.superStat[s];
+          if (val !== undefined && !isNaN(val)) {
+            view.setFloat32(charOffsets.superStatOffsets[s], Number(val), true);
+          }
+        }
       }
     }
   }

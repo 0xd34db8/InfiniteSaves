@@ -393,7 +393,7 @@ export default function App() {
       const copy = { ...prev };
       copy[rosterType] = { ...copy[rosterType] };
       const char = { ...copy[rosterType][selectedId] };
-      char[statType] = { ...char[statType], [key]: value };
+      char[statType] = { ...(char[statType] || {}), [key]: value };
       copy[rosterType][selectedId] = char;
       return copy;
     });
@@ -490,6 +490,25 @@ export default function App() {
             charId: selectedId,
             charName: sc.name || "Unknown",
             field: `superStat.${sk}`,
+            oldVal,
+            newVal,
+            timestamp: Date.now(),
+            roster: "savedChars",
+          });
+        });
+      }
+
+      // Also clone civilian base stats if present
+      if (timeMachineChar.stat) {
+        sc.stat = { ...sc.stat };
+        Object.entries(timeMachineChar.stat).forEach(([sk, newVal]) => {
+          const oldVal = sc.stat[sk];
+          sc.stat[sk] = newVal;
+          changes.push({
+            id: Date.now() + Math.random(),
+            charId: selectedId,
+            charName: sc.name || "Unknown",
+            field: `stat.${sk}`,
             oldVal,
             newVal,
             timestamp: Date.now(),
@@ -686,6 +705,13 @@ export default function App() {
   // Either from user-uploaded .bytes file or lazily fetched /Save-template.bytes
   const getBaseBufferAndOffsets = async () => {
     if (rawBytesBuffer && bytesOffsets) {
+      // If cached offsets are missing statOffsets or costumeOffsets, re-parse offsets from buffer
+      const firstCharOffsets = Object.values(bytesOffsets?.savedChars || {})[0];
+      if (firstCharOffsets && (!firstCharOffsets.statOffsets || !firstCharOffsets.costumeOffsets)) {
+        const reparsed = parseSaveBytes(rawBytesBuffer);
+        setBytesOffsets(reparsed.offsets);
+        return { buffer: rawBytesBuffer, offsets: reparsed.offsets };
+      }
       return { buffer: rawBytesBuffer, offsets: bytesOffsets };
     }
     if (templateCacheRef.current) {
