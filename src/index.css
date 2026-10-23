@@ -181,17 +181,58 @@ body {
   color: #FFFFFF;
 }
 
+/* Custom sleek scrollbars matching the site */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.16);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.28);
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.28);
+}
+
 .theme-crimson ::-webkit-scrollbar-track {
   background: #0B0608;
 }
 
 .theme-crimson ::-webkit-scrollbar-thumb {
   background: rgba(244, 63, 94, 0.25);
-  border-radius: 4px;
+  border-radius: 9999px;
 }
 
 .theme-crimson ::-webkit-scrollbar-thumb:hover {
   background: rgba(244, 63, 94, 0.45);
+}
+
+/* Firefox standard scrollbar rules */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.16) transparent;
+}
+
+.dark * {
+  scrollbar-color: rgba(255, 255, 255, 0.16) transparent;
+}
+
+.theme-crimson * {
+  scrollbar-color: rgba(244, 63, 94, 0.25) transparent;
 }
 
 /* Glassmorphism utility specified in DESIGN.md rule 2 */

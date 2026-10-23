@@ -70,7 +70,7 @@ export function PhysiqueEditor({
               </span>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center">
               <input
                 type="range"
                 min="0.50"
@@ -80,22 +80,8 @@ export function PhysiqueEditor({
                 onChange={(e) =>
                   onUpdateField("height", parseFloat(e.target.value))
                 }
-                className="flex-1 accent-neutral-900 dark:accent-[#EDEDED] cursor-pointer"
+                className="w-full accent-neutral-900 dark:accent-[#EDEDED] cursor-pointer"
               />
-              <div className="relative">
-                <input
-                  type="number"
-                  step="0.01"
-                  value={heightVal}
-                  onChange={(e) =>
-                    onUpdateField("height", parseFloat(e.target.value) || 1.0)
-                  }
-                  className="w-20 bg-white dark:bg-white/[0.03] border border-black/[0.12] dark:border-white/[0.12] text-neutral-900 dark:text-[#EDEDED] font-mono text-xs rounded-[6px] px-2 py-1.5 text-right custom-focus fast-transition tabular-nums"
-                />
-                <span className="absolute right-6 top-1/2 -translate-y-1/2 text-neutral-400 text-[10px] pointer-events-none">
-                  x
-                </span>
-              </div>
             </div>
           </div>
         </div>
@@ -112,7 +98,7 @@ export function PhysiqueEditor({
               </span>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center">
               <input
                 type="range"
                 min="0"
@@ -122,25 +108,8 @@ export function PhysiqueEditor({
                 onChange={(e) =>
                   onUpdateField("muscleMass", parseFloat(e.target.value))
                 }
-                className="flex-1 accent-neutral-900 dark:accent-[#EDEDED] cursor-pointer"
+                className="w-full accent-neutral-900 dark:accent-[#EDEDED] cursor-pointer"
               />
-              <div className="relative">
-                <input
-                  type="number"
-                  step="0.5"
-                  value={muscleVal}
-                  onChange={(e) =>
-                    onUpdateField(
-                      "muscleMass",
-                      parseFloat(e.target.value) || 0,
-                    )
-                  }
-                  className="w-20 bg-white dark:bg-white/[0.03] border border-black/[0.12] dark:border-white/[0.12] text-neutral-900 dark:text-[#EDEDED] font-mono text-xs rounded-[6px] px-2 py-1.5 text-right custom-focus fast-transition tabular-nums"
-                />
-                <span className="absolute right-6 top-1/2 -translate-y-1/2 text-neutral-400 text-[10px] pointer-events-none">
-                  %
-                </span>
-              </div>
             </div>
           </div>
         </div>
@@ -157,7 +126,7 @@ export function PhysiqueEditor({
               </span>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center">
               <input
                 type="range"
                 min="-100"
@@ -167,22 +136,8 @@ export function PhysiqueEditor({
                 onChange={(e) =>
                   onUpdateField("bodyMass", parseFloat(e.target.value))
                 }
-                className="flex-1 accent-neutral-900 dark:accent-[#EDEDED] cursor-pointer"
+                className="w-full accent-neutral-900 dark:accent-[#EDEDED] cursor-pointer"
               />
-              <div className="relative">
-                <input
-                  type="number"
-                  step="1"
-                  value={bodyMassVal}
-                  onChange={(e) =>
-                    onUpdateField("bodyMass", parseFloat(e.target.value) || 0)
-                  }
-                  className="w-20 bg-white dark:bg-white/[0.03] border border-black/[0.12] dark:border-white/[0.12] text-neutral-900 dark:text-[#EDEDED] font-mono text-xs rounded-[6px] px-2 py-1.5 text-right custom-focus fast-transition tabular-nums"
-                />
-                <span className="absolute right-6 top-1/2 -translate-y-1/2 text-neutral-400 text-[10px] pointer-events-none">
-                  %
-                </span>
-              </div>
             </div>
           </div>
         </div>
@@ -199,7 +154,7 @@ export function PhysiqueEditor({
               </span>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center">
               <input
                 type="range"
                 min="-100"
@@ -209,22 +164,8 @@ export function PhysiqueEditor({
                 onChange={(e) =>
                   onUpdateField("armMass", parseFloat(e.target.value))
                 }
-                className="flex-1 accent-neutral-900 dark:accent-[#EDEDED] cursor-pointer"
+                className="w-full accent-neutral-900 dark:accent-[#EDEDED] cursor-pointer"
               />
-              <div className="relative">
-                <input
-                  type="number"
-                  step="1"
-                  value={armMassVal}
-                  onChange={(e) =>
-                    onUpdateField("armMass", parseFloat(e.target.value) || 0)
-                  }
-                  className="w-20 bg-white dark:bg-white/[0.03] border border-black/[0.12] dark:border-white/[0.12] text-neutral-900 dark:text-[#EDEDED] font-mono text-xs rounded-[6px] px-2 py-1.5 text-right custom-focus fast-transition tabular-nums"
-                />
-                <span className="absolute right-6 top-1/2 -translate-y-1/2 text-neutral-400 text-[10px] pointer-events-none">
-                  %
-                </span>
-              </div>
             </div>
           </div>
         </div>
@@ -241,7 +182,7 @@ export function PhysiqueEditor({
               </span>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center">
               <input
                 type="range"
                 min="-100"
@@ -251,22 +192,8 @@ export function PhysiqueEditor({
                 onChange={(e) =>
                   onUpdateField("legMass", parseFloat(e.target.value))
                 }
-                className="flex-1 accent-neutral-900 dark:accent-[#EDEDED] cursor-pointer"
+                className="w-full accent-neutral-900 dark:accent-[#EDEDED] cursor-pointer"
               />
-              <div className="relative">
-                <input
-                  type="number"
-                  step="1"
-                  value={legMassVal}
-                  onChange={(e) =>
-                    onUpdateField("legMass", parseFloat(e.target.value) || 0)
-                  }
-                  className="w-20 bg-white dark:bg-white/[0.03] border border-black/[0.12] dark:border-white/[0.12] text-neutral-900 dark:text-[#EDEDED] font-mono text-xs rounded-[6px] px-2 py-1.5 text-right custom-focus fast-transition tabular-nums"
-                />
-                <span className="absolute right-6 top-1/2 -translate-y-1/2 text-neutral-400 text-[10px] pointer-events-none">
-                  %
-                </span>
-              </div>
             </div>
           </div>
         </div>
@@ -283,7 +210,7 @@ export function PhysiqueEditor({
               </span>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center">
               <input
                 type="range"
                 min="0.80"
@@ -293,25 +220,8 @@ export function PhysiqueEditor({
                 onChange={(e) =>
                   onUpdateField("headSize", parseFloat(e.target.value))
                 }
-                className="flex-1 accent-neutral-900 dark:accent-[#EDEDED] cursor-pointer"
+                className="w-full accent-neutral-900 dark:accent-[#EDEDED] cursor-pointer"
               />
-              <div className="relative">
-                <input
-                  type="number"
-                  step="0.01"
-                  value={headSizeVal}
-                  onChange={(e) =>
-                    onUpdateField(
-                      "headSize",
-                      parseFloat(e.target.value) || 1.0,
-                    )
-                  }
-                  className="w-20 bg-white dark:bg-white/[0.03] border border-black/[0.12] dark:border-white/[0.12] text-neutral-900 dark:text-[#EDEDED] font-mono text-xs rounded-[6px] px-2 py-1.5 text-right custom-focus fast-transition tabular-nums"
-                />
-                <span className="absolute right-6 top-1/2 -translate-y-1/2 text-neutral-400 text-[10px] pointer-events-none">
-                  x
-                </span>
-              </div>
             </div>
           </div>
         </div>
@@ -328,7 +238,7 @@ export function PhysiqueEditor({
               </span>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center">
               <input
                 type="range"
                 min="0.70"
@@ -338,22 +248,8 @@ export function PhysiqueEditor({
                 onChange={(e) =>
                   onUpdateField("voice", parseFloat(e.target.value))
                 }
-                className="flex-1 accent-neutral-900 dark:accent-[#EDEDED] cursor-pointer"
+                className="w-full accent-neutral-900 dark:accent-[#EDEDED] cursor-pointer"
               />
-              <div className="relative">
-                <input
-                  type="number"
-                  step="0.01"
-                  value={voiceVal}
-                  onChange={(e) =>
-                    onUpdateField("voice", parseFloat(e.target.value) || 1.0)
-                  }
-                  className="w-20 bg-white dark:bg-white/[0.03] border border-black/[0.12] dark:border-white/[0.12] text-neutral-900 dark:text-[#EDEDED] font-mono text-xs rounded-[6px] px-2 py-1.5 text-right custom-focus fast-transition tabular-nums"
-                />
-                <span className="absolute right-6 top-1/2 -translate-y-1/2 text-neutral-400 text-[10px] pointer-events-none">
-                  x
-                </span>
-              </div>
             </div>
           </div>
         </div>

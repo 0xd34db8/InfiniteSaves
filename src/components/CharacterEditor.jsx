@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import { Icon } from "./Icons";
 import {
   POWER_MAPPINGS,
@@ -18,6 +18,7 @@ function PowerDropdown({
   compact = false,
 }) {
   const dropdownRef = useRef(null);
+  const [unobservedInput, setUnobservedInput] = useState("");
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -32,12 +33,36 @@ function PowerDropdown({
     }
   }, [isOpen, onClose]);
 
-  const matched = meta.proven.find((opt) => opt.id === Number(value));
+  const numVal = Number(value);
+  const matched = meta.proven.find((opt) => opt.id === numVal);
+  const isOtherObserved =
+    !matched && meta.observed && meta.observed.includes(numVal);
+  const isUnobserved =
+    !matched && !isOtherObserved && value !== undefined && numVal !== 0;
+
+  const otherObservedIds = useMemo(() => {
+    if (!meta.observed) return [];
+    const provenIds = new Set(meta.proven.map((p) => p.id));
+    return meta.observed.filter((id) => !provenIds.has(id));
+  }, [meta]);
+
   const currentLabel = matched
     ? cleanPowerLabel(matched.label)
-    : value !== undefined && value !== 0
-      ? `Custom (${value})`
+    : isOtherObserved || isUnobserved
+      ? `Internal ID (${numVal})`
       : "None";
+
+  const handleApplyUnobserved = () => {
+    const targetStr =
+      unobservedInput.trim() ||
+      (!matched && numVal !== 0 ? String(numVal) : "");
+    const parsed = parseInt(targetStr, 10);
+    if (!isNaN(parsed)) {
+      onChange(parsed);
+      setUnobservedInput("");
+      onClose();
+    }
+  };
 
   return (
     <div className="relative" ref={dropdownRef}>
@@ -62,11 +87,15 @@ function PowerDropdown({
       {isOpen && (
         <div
           className={`absolute ${
-            compact ? "min-w-[170px] left-0" : "left-0 right-0"
-          } top-full mt-1.5 z-50 bg-white dark:bg-[#141414] border border-black/[0.12] dark:border-white/[0.12] rounded-[8px] py-1 shadow-lg max-h-60 overflow-y-auto`}
+            compact ? "min-w-[210px] left-0" : "left-0 right-0"
+          } top-full mt-1.5 z-50 bg-white dark:bg-[#141414] border border-black/[0.12] dark:border-white/[0.12] rounded-[8px] py-1 shadow-lg max-h-72 overflow-y-auto`}
         >
+          {/* Observed Powers */}
+          <div className="px-3 py-1 text-[10px] font-semibold text-neutral-400 dark:text-neutral-500 uppercase tracking-wider">
+            Observed
+          </div>
           {meta.proven.map((opt) => {
-            const isSelected = Number(value) === opt.id;
+            const isSelected = numVal === opt.id;
             return (
               <button
                 key={opt.id}
@@ -84,20 +113,88 @@ function PowerDropdown({
                 <span className="truncate text-neutral-900 dark:text-[#EDEDED]">
                   {cleanPowerLabel(opt.label)}
                 </span>
+                <span className="text-[10px] text-neutral-400 dark:text-neutral-500 font-mono ml-2">
+                  {opt.id}
+                </span>
               </button>
             );
           })}
 
-          {!matched && value !== 0 && value !== undefined && (
-            <button
-              type="button"
-              className="w-full px-3 py-1.5 text-xs flex items-center justify-between text-left bg-black/[0.06] dark:bg-white/[0.08] font-medium cursor-pointer"
+          {/* Line separating Observed from Internal IDs */}
+          <div className="border-t border-black/[0.08] dark:border-white/[0.08] my-1" />
+
+          {/* Internal IDs Section */}
+          <div className="px-3 py-1 text-[10px] font-semibold text-neutral-400 dark:text-neutral-500 uppercase tracking-wider">
+            Internal IDs
+          </div>
+
+          {/* Continuous list of internal IDs (no nested scrollbar) */}
+          {otherObservedIds.map((id) => {
+            const isSelected = numVal === id;
+            return (
+              <button
+                key={id}
+                type="button"
+                onClick={() => {
+                  onChange(id);
+                  onClose();
+                }}
+                className={`w-full px-3 py-1.5 text-xs flex items-center justify-between text-left fast-transition cursor-pointer ${
+                  isSelected
+                    ? "bg-black/[0.06] dark:bg-white/[0.08] font-medium"
+                    : "hover:bg-black/[0.04] dark:hover:bg-white/[0.04]"
+                }`}
+              >
+                <span className="truncate text-neutral-700 dark:text-neutral-300">
+                  Internal ID: {id}
+                </span>
+              </button>
+            );
+          })}
+
+          {/* Custom / Direct Internal ID Input */}
+          <div className="border-t border-black/[0.06] dark:border-white/[0.06] my-1 pt-1.5 px-3 pb-1.5">
+            <div className="text-[10px] font-semibold text-neutral-400 dark:text-neutral-500 uppercase tracking-wider mb-1.5">
+              Custom Internal ID
+            </div>
+            {!matched && numVal !== 0 && value !== undefined && (
+              <div className="mb-2 px-2 py-1 rounded bg-black/[0.04] dark:bg-white/[0.06] text-xs font-mono text-neutral-800 dark:text-neutral-200 flex items-center justify-between">
+                <span>Selected: {numVal}</span>
+                <span className="text-[10px] text-neutral-400 font-sans">
+                  Active
+                </span>
+              </div>
+            )}
+            <div
+              className="flex items-center gap-1.5"
+              onClick={(e) => e.stopPropagation()}
             >
-              <span className="truncate text-neutral-900 dark:text-[#EDEDED]">
-                Custom ({value})
-              </span>
-            </button>
-          )}
+              <input
+                type="number"
+                value={unobservedInput}
+                onChange={(e) => setUnobservedInput(e.target.value)}
+                placeholder={
+                  !matched && numVal !== 0
+                    ? `Current ID: ${numVal}`
+                    : "Type internal ID..."
+                }
+                className="w-full bg-black/[0.03] dark:bg-white/[0.04] border border-black/[0.12] dark:border-white/[0.12] rounded px-2 py-1 text-xs text-neutral-900 dark:text-[#EDEDED] font-mono focus:outline-none focus:border-black/[0.3] dark:focus:border-white/[0.3]"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    handleApplyUnobserved();
+                  }
+                }}
+              />
+              <button
+                type="button"
+                onClick={handleApplyUnobserved}
+                className="cursor-pointer px-2.5 py-1 text-xs font-medium rounded bg-black/[0.08] hover:bg-black/[0.12] dark:bg-white/[0.08] dark:hover:bg-white/[0.14] text-neutral-800 dark:text-[#EDEDED] border border-black/[0.08] dark:border-white/[0.08] fast-transition shrink-0 active:scale-[0.98]"
+              >
+                Set
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

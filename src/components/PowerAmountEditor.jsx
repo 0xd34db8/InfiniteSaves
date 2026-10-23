@@ -91,13 +91,6 @@ export function PowerAmountEditor({
           </button>
           <button
             type="button"
-            onClick={() => handleBoostAll(500)}
-            className="cursor-pointer text-xs font-medium px-2.5 py-1.5 rounded-[6px] bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-400 border border-amber-500/25 fast-transition active:scale-[0.98]"
-          >
-            God Mode (500%)
-          </button>
-          <button
-            type="button"
             onClick={() => handleBoostAll(150)}
             className="cursor-pointer text-xs font-medium px-2.5 py-1.5 rounded-[6px] bg-black/[0.04] hover:bg-black/[0.08] dark:bg-white/[0.04] dark:hover:bg-white/[0.08] text-neutral-700 dark:text-neutral-300 border border-black/[0.08] dark:border-white/[0.08] fast-transition"
           >
@@ -152,8 +145,8 @@ export function PowerAmountEditor({
                   </span>
                 </div>
 
-                {/* Slider & Number Input */}
-                <div className="flex items-center gap-3">
+                {/* Slider */}
+                <div className="flex items-center">
                   <input
                     type="range"
                     min="0"
@@ -161,20 +154,8 @@ export function PowerAmountEditor({
                     step="0.5"
                     value={sliderVal}
                     onChange={(e) => onUpdateStat(activeStatTab, key, parseFloat(e.target.value))}
-                    className="flex-1 accent-neutral-900 dark:accent-[#EDEDED] cursor-pointer"
+                    className="w-full accent-neutral-900 dark:accent-[#EDEDED] cursor-pointer"
                   />
-                  <div className="relative">
-                    <input
-                      type="number"
-                      step="0.5"
-                      value={rawVal}
-                      onChange={(e) => onUpdateStat(activeStatTab, key, parseFloat(e.target.value) || 0)}
-                      className="w-20 bg-white dark:bg-white/[0.03] border border-black/[0.12] dark:border-white/[0.12] text-neutral-900 dark:text-[#EDEDED] font-mono text-xs rounded-[6px] px-2 py-1.5 text-right custom-focus fast-transition tabular-nums"
-                    />
-                    <span className="absolute right-6 top-1/2 -translate-y-1/2 text-neutral-400 text-[10px] pointer-events-none">
-                      %
-                    </span>
-                  </div>
                 </div>
               </div>
             </div>
